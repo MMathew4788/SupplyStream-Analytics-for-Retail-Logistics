@@ -1,0 +1,501 @@
+SKU,Product_Name,Category,Sub_Category,Weight_kg,Volume_cbm,Base_Demand_Min,Base_Demand_Max
+SKU0001,Aanya Silk Anarkali,Dress,Silk Anarkali,1.02,0.0044,5,15
+SKU0002,Zoya Silk Anarkali,Dress,Silk Anarkali,0.49,0.005,5,15
+SKU0003,Celeste Canvas Belt,Accessories,Canvas Belt,0.34,0.0057,8,25
+SKU0004,Luna Analog Watch,Accessories,Analog Watch,0.08,0.0005,8,25
+SKU0005,Aura Canvas Belt,Accessories,Canvas Belt,0.78,0.0174,8,25
+SKU0006,Elara Silk Anarkali,Dress,Silk Anarkali,0.84,0.0043,5,15
+SKU0007,Eon Canvas Belt,Accessories,Canvas Belt,0.97,0.0174,8,25
+SKU0008,Zoya Cotton Kurta,Dress,Cotton Kurta,0.99,0.004,5,15
+SKU0009,Orion Block Heels,Shoes,Block Heels,0.95,0.0145,3,10
+SKU0010,Celeste Analog Watch,Accessories,Analog Watch,0.14,0.0004,8,25
+SKU0011,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.19,0.0005,8,25
+SKU0012,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.32,0.0076,5,15
+SKU0013,Vector Canvas Sneakers,Shoes,Canvas Sneakers,0.74,0.0107,3,10
+SKU0014,Elara Cotton Kurta,Dress,Cotton Kurta,1.03,0.0079,5,15
+SKU0015,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.07,0.0003,8,25
+SKU0016,Celeste Canvas Belt,Accessories,Canvas Belt,0.94,0.0154,8,25
+SKU0017,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.11,0.0005,8,25
+SKU0018,Orion Leather Loafers,Shoes,Leather Loafers,0.72,0.0084,3,10
+SKU0019,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.06,0.0001,8,25
+SKU0020,Aanya Linen Shirt Dress,Dress,Linen Shirt Dress,0.76,0.0037,5,15
+SKU0021,Orion Canvas Sneakers,Shoes,Canvas Sneakers,1.22,0.0138,3,10
+SKU0022,Celeste Canvas Belt,Accessories,Canvas Belt,0.81,0.0163,8,25
+SKU0023,Aanya Cotton Kurta,Dress,Cotton Kurta,0.89,0.0041,5,15
+SKU0024,Vector Block Heels,Shoes,Block Heels,1.17,0.0148,3,10
+SKU0025,Elara Cotton Kurta,Dress,Cotton Kurta,0.96,0.0068,5,15
+SKU0026,Riya Silk Anarkali,Dress,Silk Anarkali,0.47,0.0047,5,15
+SKU0027,Nova Canvas Sneakers,Shoes,Canvas Sneakers,0.96,0.0137,3,10
+SKU0028,Aanya Georgette Saree,Dress,Georgette Saree,0.35,0.008,5,15
+SKU0029,Riya Cotton Kurta,Dress,Cotton Kurta,0.45,0.0049,5,15
+SKU0030,Aanya Georgette Saree,Dress,Georgette Saree,0.45,0.002,5,15
+SKU0031,Apex Ethnic Juttis,Shoes,Ethnic Juttis,0.79,0.012,3,10
+SKU0032,Celeste Canvas Belt,Accessories,Canvas Belt,0.27,0.0051,8,25
+SKU0033,Zoya Cotton Kurta,Dress,Cotton Kurta,0.35,0.0055,5,15
+SKU0034,Aura Silver Jhumkas,Accessories,Silver Jhumkas,0.08,0.0003,8,25
+SKU0035,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.09,0.0003,8,25
+SKU0036,Luna Leather Handbag,Accessories,Leather Handbag,0.69,0.0117,8,25
+SKU0037,Orion Ethnic Juttis,Shoes,Ethnic Juttis,1.17,0.0081,3,10
+SKU0038,Orion Block Heels,Shoes,Block Heels,1.17,0.008,3,10
+SKU0039,Vector Leather Loafers,Shoes,Leather Loafers,0.96,0.015,3,10
+SKU0040,Riya Cotton Kurta,Dress,Cotton Kurta,0.76,0.0028,5,15
+SKU0041,Orion Leather Loafers,Shoes,Leather Loafers,0.87,0.0066,3,10
+SKU0042,Aura Analog Watch,Accessories,Analog Watch,0.19,0.0001,8,25
+SKU0043,Aanya Linen Shirt Dress,Dress,Linen Shirt Dress,1.1,0.0065,5,15
+SKU0044,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.84,0.0063,5,15
+SKU0045,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.53,0.0074,5,15
+SKU0046,Elara Cotton Kurta,Dress,Cotton Kurta,1.05,0.0023,5,15
+SKU0047,Nova Canvas Sneakers,Shoes,Canvas Sneakers,0.66,0.0094,3,10
+SKU0048,Aura Canvas Belt,Accessories,Canvas Belt,0.2,0.019,8,25
+SKU0049,Aura Silver Jhumkas,Accessories,Silver Jhumkas,0.07,0.0002,8,25
+SKU0050,Vector Ethnic Juttis,Shoes,Ethnic Juttis,1.4,0.0071,3,10
+SKU0051,Zoya Cotton Kurta,Dress,Cotton Kurta,1.0,0.0073,5,15
+SKU0052,Orion Canvas Sneakers,Shoes,Canvas Sneakers,1.36,0.0148,3,10
+SKU0053,Aanya Georgette Saree,Dress,Georgette Saree,0.46,0.0075,5,15
+SKU0054,Nova Canvas Sneakers,Shoes,Canvas Sneakers,0.66,0.012,3,10
+SKU0055,Apex Leather Loafers,Shoes,Leather Loafers,0.72,0.0132,3,10
+SKU0056,Nova Ethnic Juttis,Shoes,Ethnic Juttis,1.32,0.0137,3,10
+SKU0057,Riya Cotton Kurta,Dress,Cotton Kurta,0.66,0.0037,5,15
+SKU0058,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.88,0.0044,5,15
+SKU0059,Aura Analog Watch,Accessories,Analog Watch,0.08,0.0005,8,25
+SKU0060,Vector Leather Loafers,Shoes,Leather Loafers,1.1,0.0085,3,10
+SKU0061,Vector Block Heels,Shoes,Block Heels,0.89,0.0108,3,10
+SKU0062,Apex Leather Loafers,Shoes,Leather Loafers,0.5,0.0143,3,10
+SKU0063,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.19,0.0003,8,25
+SKU0064,Eon Leather Handbag,Accessories,Leather Handbag,0.56,0.0137,8,25
+SKU0065,Nova Block Heels,Shoes,Block Heels,1.05,0.0069,3,10
+SKU0066,Celeste Canvas Belt,Accessories,Canvas Belt,0.65,0.0067,8,25
+SKU0067,Eon Leather Handbag,Accessories,Leather Handbag,0.36,0.0092,8,25
+SKU0068,Luna Analog Watch,Accessories,Analog Watch,0.13,0.0004,8,25
+SKU0069,Aura Silver Jhumkas,Accessories,Silver Jhumkas,0.14,0.0001,8,25
+SKU0070,Riya Linen Shirt Dress,Dress,Linen Shirt Dress,1.03,0.0029,5,15
+SKU0071,Elara Silk Anarkali,Dress,Silk Anarkali,0.85,0.0066,5,15
+SKU0072,Orion Block Heels,Shoes,Block Heels,1.22,0.0088,3,10
+SKU0073,Orion Canvas Sneakers,Shoes,Canvas Sneakers,1.16,0.0051,3,10
+SKU0074,Riya Georgette Saree,Dress,Georgette Saree,0.46,0.0077,5,15
+SKU0075,Aura Canvas Belt,Accessories,Canvas Belt,0.6,0.0184,8,25
+SKU0076,Riya Georgette Saree,Dress,Georgette Saree,1.02,0.006,5,15
+SKU0077,Luna Analog Watch,Accessories,Analog Watch,0.13,0.0004,8,25
+SKU0078,Celeste Canvas Belt,Accessories,Canvas Belt,0.77,0.01,8,25
+SKU0079,Nova Canvas Sneakers,Shoes,Canvas Sneakers,1.27,0.0102,3,10
+SKU0080,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.09,0.0002,8,25
+SKU0081,Celeste Leather Handbag,Accessories,Leather Handbag,0.24,0.0083,8,25
+SKU0082,Aanya Silk Anarkali,Dress,Silk Anarkali,0.67,0.004,5,15
+SKU0083,Vector Block Heels,Shoes,Block Heels,0.71,0.0092,3,10
+SKU0084,Luna Leather Handbag,Accessories,Leather Handbag,0.53,0.0189,8,25
+SKU0085,Apex Block Heels,Shoes,Block Heels,1.04,0.0123,3,10
+SKU0086,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.05,0.0002,8,25
+SKU0087,Celeste Canvas Belt,Accessories,Canvas Belt,0.86,0.0185,8,25
+SKU0088,Luna Leather Handbag,Accessories,Leather Handbag,0.63,0.0136,8,25
+SKU0089,Riya Georgette Saree,Dress,Georgette Saree,1.08,0.0031,5,15
+SKU0090,Nova Block Heels,Shoes,Block Heels,0.71,0.0083,3,10
+SKU0091,Apex Ethnic Juttis,Shoes,Ethnic Juttis,0.75,0.0058,3,10
+SKU0092,Zoya Cotton Kurta,Dress,Cotton Kurta,0.5,0.0024,5,15
+SKU0093,Aura Leather Handbag,Accessories,Leather Handbag,0.95,0.0048,8,25
+SKU0094,Riya Silk Anarkali,Dress,Silk Anarkali,0.41,0.006,5,15
+SKU0095,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.08,0.0003,8,25
+SKU0096,Celeste Leather Handbag,Accessories,Leather Handbag,0.97,0.0031,8,25
+SKU0097,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.66,0.0063,5,15
+SKU0098,Aanya Silk Anarkali,Dress,Silk Anarkali,0.93,0.0038,5,15
+SKU0099,Aura Leather Handbag,Accessories,Leather Handbag,0.41,0.0091,8,25
+SKU0100,Nova Leather Loafers,Shoes,Leather Loafers,0.51,0.0092,3,10
+SKU0101,Apex Leather Loafers,Shoes,Leather Loafers,1.46,0.0114,3,10
+SKU0102,Apex Canvas Sneakers,Shoes,Canvas Sneakers,0.68,0.0102,3,10
+SKU0103,Luna Analog Watch,Accessories,Analog Watch,0.14,0.0002,8,25
+SKU0104,Zoya Cotton Kurta,Dress,Cotton Kurta,1.09,0.0035,5,15
+SKU0105,Nova Block Heels,Shoes,Block Heels,0.53,0.0135,3,10
+SKU0106,Riya Georgette Saree,Dress,Georgette Saree,0.62,0.0036,5,15
+SKU0107,Vector Ethnic Juttis,Shoes,Ethnic Juttis,1.02,0.0069,3,10
+SKU0108,Elara Georgette Saree,Dress,Georgette Saree,0.8,0.0034,5,15
+SKU0109,Apex Block Heels,Shoes,Block Heels,1.29,0.0059,3,10
+SKU0110,Riya Georgette Saree,Dress,Georgette Saree,0.58,0.0055,5,15
+SKU0111,Apex Ethnic Juttis,Shoes,Ethnic Juttis,1.5,0.0105,3,10
+SKU0112,Nova Block Heels,Shoes,Block Heels,0.81,0.0073,3,10
+SKU0113,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.16,0.0002,8,25
+SKU0114,Zoya Georgette Saree,Dress,Georgette Saree,0.95,0.0079,5,15
+SKU0115,Aura Analog Watch,Accessories,Analog Watch,0.1,0.0002,8,25
+SKU0116,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.09,0.0005,8,25
+SKU0117,Aura Canvas Belt,Accessories,Canvas Belt,0.89,0.0119,8,25
+SKU0118,Apex Block Heels,Shoes,Block Heels,0.84,0.0147,3,10
+SKU0119,Vector Block Heels,Shoes,Block Heels,1.32,0.009,3,10
+SKU0120,Riya Cotton Kurta,Dress,Cotton Kurta,0.43,0.0054,5,15
+SKU0121,Orion Leather Loafers,Shoes,Leather Loafers,0.62,0.0126,3,10
+SKU0122,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.18,0.0005,8,25
+SKU0123,Vector Leather Loafers,Shoes,Leather Loafers,1.45,0.0071,3,10
+SKU0124,Aanya Linen Shirt Dress,Dress,Linen Shirt Dress,0.44,0.003,5,15
+SKU0125,Aanya Silk Anarkali,Dress,Silk Anarkali,0.67,0.0061,5,15
+SKU0126,Vector Ethnic Juttis,Shoes,Ethnic Juttis,0.73,0.0121,3,10
+SKU0127,Aura Canvas Belt,Accessories,Canvas Belt,0.72,0.0186,8,25
+SKU0128,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.07,0.0002,8,25
+SKU0129,Aanya Cotton Kurta,Dress,Cotton Kurta,0.45,0.0038,5,15
+SKU0130,Luna Analog Watch,Accessories,Analog Watch,0.15,0.0005,8,25
+SKU0131,Luna Canvas Belt,Accessories,Canvas Belt,0.17,0.0018,8,25
+SKU0132,Nova Ethnic Juttis,Shoes,Ethnic Juttis,0.53,0.0073,3,10
+SKU0133,Eon Leather Handbag,Accessories,Leather Handbag,0.62,0.0155,8,25
+SKU0134,Elara Georgette Saree,Dress,Georgette Saree,1.12,0.0031,5,15
+SKU0135,Luna Canvas Belt,Accessories,Canvas Belt,0.97,0.0099,8,25
+SKU0136,Nova Ethnic Juttis,Shoes,Ethnic Juttis,1.17,0.0136,3,10
+SKU0137,Apex Block Heels,Shoes,Block Heels,0.79,0.0145,3,10
+SKU0138,Luna Leather Handbag,Accessories,Leather Handbag,0.18,0.0058,8,25
+SKU0139,Aanya Georgette Saree,Dress,Georgette Saree,0.89,0.0053,5,15
+SKU0140,Orion Leather Loafers,Shoes,Leather Loafers,1.02,0.0112,3,10
+SKU0141,Vector Block Heels,Shoes,Block Heels,0.7,0.0105,3,10
+SKU0142,Apex Block Heels,Shoes,Block Heels,0.62,0.0147,3,10
+SKU0143,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.11,0.0002,8,25
+SKU0144,Aanya Georgette Saree,Dress,Georgette Saree,0.88,0.0029,5,15
+SKU0145,Eon Analog Watch,Accessories,Analog Watch,0.12,0.0003,8,25
+SKU0146,Riya Georgette Saree,Dress,Georgette Saree,1.13,0.005,5,15
+SKU0147,Zoya Cotton Kurta,Dress,Cotton Kurta,1.0,0.0071,5,15
+SKU0148,Vector Ethnic Juttis,Shoes,Ethnic Juttis,0.78,0.008,3,10
+SKU0149,Celeste Canvas Belt,Accessories,Canvas Belt,0.5,0.0102,8,25
+SKU0150,Apex Block Heels,Shoes,Block Heels,1.43,0.0137,3,10
+SKU0151,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.06,0.0004,8,25
+SKU0152,Luna Canvas Belt,Accessories,Canvas Belt,0.99,0.0161,8,25
+SKU0153,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.19,0.0002,8,25
+SKU0154,Aanya Georgette Saree,Dress,Georgette Saree,0.77,0.0047,5,15
+SKU0155,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.06,0.0004,8,25
+SKU0156,Apex Ethnic Juttis,Shoes,Ethnic Juttis,1.15,0.0135,3,10
+SKU0157,Eon Canvas Belt,Accessories,Canvas Belt,0.66,0.0179,8,25
+SKU0158,Vector Leather Loafers,Shoes,Leather Loafers,0.73,0.0118,3,10
+SKU0159,Vector Canvas Sneakers,Shoes,Canvas Sneakers,0.93,0.006,3,10
+SKU0160,Luna Leather Handbag,Accessories,Leather Handbag,0.25,0.0067,8,25
+SKU0161,Zoya Cotton Kurta,Dress,Cotton Kurta,1.02,0.0038,5,15
+SKU0162,Orion Block Heels,Shoes,Block Heels,0.74,0.0091,3,10
+SKU0163,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.11,0.0004,8,25
+SKU0164,Orion Canvas Sneakers,Shoes,Canvas Sneakers,0.96,0.0075,3,10
+SKU0165,Apex Leather Loafers,Shoes,Leather Loafers,1.4,0.0118,3,10
+SKU0166,Elara Cotton Kurta,Dress,Cotton Kurta,1.15,0.0079,5,15
+SKU0167,Nova Block Heels,Shoes,Block Heels,0.96,0.008,3,10
+SKU0168,Vector Block Heels,Shoes,Block Heels,0.74,0.0107,3,10
+SKU0169,Eon Analog Watch,Accessories,Analog Watch,0.11,0.0001,8,25
+SKU0170,Luna Leather Handbag,Accessories,Leather Handbag,0.85,0.0182,8,25
+SKU0171,Riya Linen Shirt Dress,Dress,Linen Shirt Dress,0.87,0.0057,5,15
+SKU0172,Aura Silver Jhumkas,Accessories,Silver Jhumkas,0.1,0.0003,8,25
+SKU0173,Celeste Analog Watch,Accessories,Analog Watch,0.16,0.0002,8,25
+SKU0174,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,1.05,0.0035,5,15
+SKU0175,Nova Ethnic Juttis,Shoes,Ethnic Juttis,1.3,0.0097,3,10
+SKU0176,Riya Silk Anarkali,Dress,Silk Anarkali,1.07,0.0063,5,15
+SKU0177,Vector Ethnic Juttis,Shoes,Ethnic Juttis,1.29,0.0051,3,10
+SKU0178,Luna Leather Handbag,Accessories,Leather Handbag,0.43,0.0152,8,25
+SKU0179,Nova Block Heels,Shoes,Block Heels,0.61,0.0073,3,10
+SKU0180,Riya Linen Shirt Dress,Dress,Linen Shirt Dress,0.88,0.0058,5,15
+SKU0181,Apex Ethnic Juttis,Shoes,Ethnic Juttis,0.62,0.0055,3,10
+SKU0182,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.4,0.0034,5,15
+SKU0183,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.16,0.0005,8,25
+SKU0184,Apex Canvas Sneakers,Shoes,Canvas Sneakers,1.15,0.0133,3,10
+SKU0185,Eon Canvas Belt,Accessories,Canvas Belt,0.13,0.008,8,25
+SKU0186,Orion Block Heels,Shoes,Block Heels,1.36,0.006,3,10
+SKU0187,Eon Analog Watch,Accessories,Analog Watch,0.2,0.0005,8,25
+SKU0188,Orion Leather Loafers,Shoes,Leather Loafers,1.14,0.011,3,10
+SKU0189,Zoya Cotton Kurta,Dress,Cotton Kurta,0.52,0.0028,5,15
+SKU0190,Aura Silver Jhumkas,Accessories,Silver Jhumkas,0.14,0.0004,8,25
+SKU0191,Riya Linen Shirt Dress,Dress,Linen Shirt Dress,1.01,0.0056,5,15
+SKU0192,Orion Canvas Sneakers,Shoes,Canvas Sneakers,1.04,0.013,3,10
+SKU0193,Riya Cotton Kurta,Dress,Cotton Kurta,0.31,0.0067,5,15
+SKU0194,Aanya Linen Shirt Dress,Dress,Linen Shirt Dress,0.46,0.0023,5,15
+SKU0195,Aura Canvas Belt,Accessories,Canvas Belt,0.77,0.01,8,25
+SKU0196,Apex Leather Loafers,Shoes,Leather Loafers,1.0,0.0145,3,10
+SKU0197,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.88,0.0022,5,15
+SKU0198,Apex Block Heels,Shoes,Block Heels,1.19,0.0099,3,10
+SKU0199,Vector Leather Loafers,Shoes,Leather Loafers,0.82,0.0065,3,10
+SKU0200,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.64,0.0056,5,15
+SKU0201,Apex Block Heels,Shoes,Block Heels,0.6,0.012,3,10
+SKU0202,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.1,0.0003,8,25
+SKU0203,Nova Leather Loafers,Shoes,Leather Loafers,0.93,0.0117,3,10
+SKU0204,Apex Canvas Sneakers,Shoes,Canvas Sneakers,0.57,0.0133,3,10
+SKU0205,Aanya Georgette Saree,Dress,Georgette Saree,0.97,0.0042,5,15
+SKU0206,Zoya Cotton Kurta,Dress,Cotton Kurta,0.9,0.0045,5,15
+SKU0207,Aura Canvas Belt,Accessories,Canvas Belt,0.97,0.0124,8,25
+SKU0208,Orion Leather Loafers,Shoes,Leather Loafers,0.65,0.0098,3,10
+SKU0209,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.4,0.0037,5,15
+SKU0210,Aanya Georgette Saree,Dress,Georgette Saree,0.85,0.0059,5,15
+SKU0211,Aura Analog Watch,Accessories,Analog Watch,0.1,0.0002,8,25
+SKU0212,Riya Silk Anarkali,Dress,Silk Anarkali,0.81,0.0044,5,15
+SKU0213,Aanya Cotton Kurta,Dress,Cotton Kurta,0.97,0.0033,5,15
+SKU0214,Nova Block Heels,Shoes,Block Heels,0.66,0.0081,3,10
+SKU0215,Vector Leather Loafers,Shoes,Leather Loafers,0.66,0.0125,3,10
+SKU0216,Zoya Cotton Kurta,Dress,Cotton Kurta,0.7,0.0045,5,15
+SKU0217,Luna Canvas Belt,Accessories,Canvas Belt,0.35,0.0153,8,25
+SKU0218,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.4,0.0061,5,15
+SKU0219,Eon Canvas Belt,Accessories,Canvas Belt,0.14,0.0085,8,25
+SKU0220,Aura Leather Handbag,Accessories,Leather Handbag,0.28,0.019,8,25
+SKU0221,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.6,0.002,5,15
+SKU0222,Celeste Canvas Belt,Accessories,Canvas Belt,0.22,0.0111,8,25
+SKU0223,Aanya Linen Shirt Dress,Dress,Linen Shirt Dress,0.66,0.0065,5,15
+SKU0224,Apex Leather Loafers,Shoes,Leather Loafers,1.42,0.0136,3,10
+SKU0225,Luna Canvas Belt,Accessories,Canvas Belt,0.74,0.0089,8,25
+SKU0226,Aanya Georgette Saree,Dress,Georgette Saree,1.17,0.003,5,15
+SKU0227,Eon Canvas Belt,Accessories,Canvas Belt,0.18,0.017,8,25
+SKU0228,Elara Georgette Saree,Dress,Georgette Saree,0.77,0.0044,5,15
+SKU0229,Orion Ethnic Juttis,Shoes,Ethnic Juttis,0.83,0.0067,3,10
+SKU0230,Celeste Leather Handbag,Accessories,Leather Handbag,0.92,0.0076,8,25
+SKU0231,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.08,0.0002,8,25
+SKU0232,Celeste Leather Handbag,Accessories,Leather Handbag,0.96,0.0129,8,25
+SKU0233,Nova Block Heels,Shoes,Block Heels,1.36,0.0113,3,10
+SKU0234,Aanya Georgette Saree,Dress,Georgette Saree,0.72,0.0058,5,15
+SKU0235,Nova Leather Loafers,Shoes,Leather Loafers,1.01,0.0081,3,10
+SKU0236,Vector Leather Loafers,Shoes,Leather Loafers,0.87,0.0079,3,10
+SKU0237,Luna Leather Handbag,Accessories,Leather Handbag,0.52,0.0115,8,25
+SKU0238,Luna Leather Handbag,Accessories,Leather Handbag,0.92,0.0119,8,25
+SKU0239,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.75,0.0077,5,15
+SKU0240,Nova Leather Loafers,Shoes,Leather Loafers,1.48,0.0058,3,10
+SKU0241,Aura Silver Jhumkas,Accessories,Silver Jhumkas,0.12,0.0003,8,25
+SKU0242,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,1.13,0.0043,5,15
+SKU0243,Nova Leather Loafers,Shoes,Leather Loafers,0.57,0.0059,3,10
+SKU0244,Eon Canvas Belt,Accessories,Canvas Belt,0.33,0.0172,8,25
+SKU0245,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.19,0.0002,8,25
+SKU0246,Celeste Canvas Belt,Accessories,Canvas Belt,0.64,0.0188,8,25
+SKU0247,Nova Block Heels,Shoes,Block Heels,1.31,0.0117,3,10
+SKU0248,Luna Leather Handbag,Accessories,Leather Handbag,0.56,0.0013,8,25
+SKU0249,Orion Canvas Sneakers,Shoes,Canvas Sneakers,0.84,0.0127,3,10
+SKU0250,Riya Silk Anarkali,Dress,Silk Anarkali,0.44,0.0038,5,15
+SKU0251,Zoya Cotton Kurta,Dress,Cotton Kurta,1.09,0.0057,5,15
+SKU0252,Celeste Canvas Belt,Accessories,Canvas Belt,0.25,0.0168,8,25
+SKU0253,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.16,0.0005,8,25
+SKU0254,Luna Analog Watch,Accessories,Analog Watch,0.19,0.0004,8,25
+SKU0255,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.72,0.0037,5,15
+SKU0256,Orion Block Heels,Shoes,Block Heels,1.32,0.013,3,10
+SKU0257,Aanya Linen Shirt Dress,Dress,Linen Shirt Dress,0.88,0.0072,5,15
+SKU0258,Aura Leather Handbag,Accessories,Leather Handbag,0.36,0.0155,8,25
+SKU0259,Orion Block Heels,Shoes,Block Heels,1.33,0.0059,3,10
+SKU0260,Zoya Georgette Saree,Dress,Georgette Saree,1.14,0.0045,5,15
+SKU0261,Orion Ethnic Juttis,Shoes,Ethnic Juttis,0.89,0.0058,3,10
+SKU0262,Zoya Cotton Kurta,Dress,Cotton Kurta,1.14,0.007,5,15
+SKU0263,Celeste Analog Watch,Accessories,Analog Watch,0.17,0.0004,8,25
+SKU0264,Elara Georgette Saree,Dress,Georgette Saree,0.85,0.0074,5,15
+SKU0265,Riya Linen Shirt Dress,Dress,Linen Shirt Dress,1.05,0.0053,5,15
+SKU0266,Aura Canvas Belt,Accessories,Canvas Belt,0.8,0.0055,8,25
+SKU0267,Riya Cotton Kurta,Dress,Cotton Kurta,0.68,0.0068,5,15
+SKU0268,Vector Leather Loafers,Shoes,Leather Loafers,1.34,0.01,3,10
+SKU0269,Celeste Leather Handbag,Accessories,Leather Handbag,0.75,0.0065,8,25
+SKU0270,Riya Linen Shirt Dress,Dress,Linen Shirt Dress,0.81,0.0031,5,15
+SKU0271,Eon Leather Handbag,Accessories,Leather Handbag,0.16,0.011,8,25
+SKU0272,Luna Leather Handbag,Accessories,Leather Handbag,0.89,0.0018,8,25
+SKU0273,Nova Ethnic Juttis,Shoes,Ethnic Juttis,1.25,0.0086,3,10
+SKU0274,Riya Linen Shirt Dress,Dress,Linen Shirt Dress,0.96,0.0058,5,15
+SKU0275,Celeste Analog Watch,Accessories,Analog Watch,0.17,0.0002,8,25
+SKU0276,Luna Canvas Belt,Accessories,Canvas Belt,0.67,0.0164,8,25
+SKU0277,Aanya Georgette Saree,Dress,Georgette Saree,0.56,0.0023,5,15
+SKU0278,Zoya Cotton Kurta,Dress,Cotton Kurta,1.14,0.0051,5,15
+SKU0279,Eon Canvas Belt,Accessories,Canvas Belt,0.13,0.0133,8,25
+SKU0280,Vector Ethnic Juttis,Shoes,Ethnic Juttis,1.37,0.0083,3,10
+SKU0281,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,1.1,0.0065,5,15
+SKU0282,Orion Ethnic Juttis,Shoes,Ethnic Juttis,1.0,0.01,3,10
+SKU0283,Aura Analog Watch,Accessories,Analog Watch,0.14,0.0004,8,25
+SKU0284,Eon Analog Watch,Accessories,Analog Watch,0.09,0.0003,8,25
+SKU0285,Celeste Canvas Belt,Accessories,Canvas Belt,0.72,0.0077,8,25
+SKU0286,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.55,0.0079,5,15
+SKU0287,Elara Cotton Kurta,Dress,Cotton Kurta,0.63,0.0068,5,15
+SKU0288,Aura Silver Jhumkas,Accessories,Silver Jhumkas,0.17,0.0001,8,25
+SKU0289,Zoya Silk Anarkali,Dress,Silk Anarkali,0.63,0.0077,5,15
+SKU0290,Elara Silk Anarkali,Dress,Silk Anarkali,1.15,0.0042,5,15
+SKU0291,Zoya Silk Anarkali,Dress,Silk Anarkali,0.66,0.0059,5,15
+SKU0292,Aanya Cotton Kurta,Dress,Cotton Kurta,0.96,0.005,5,15
+SKU0293,Nova Leather Loafers,Shoes,Leather Loafers,1.27,0.012,3,10
+SKU0294,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.48,0.0028,5,15
+SKU0295,Riya Georgette Saree,Dress,Georgette Saree,1.11,0.0047,5,15
+SKU0296,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.94,0.0053,5,15
+SKU0297,Orion Ethnic Juttis,Shoes,Ethnic Juttis,1.21,0.0143,3,10
+SKU0298,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.08,0.0002,8,25
+SKU0299,Nova Leather Loafers,Shoes,Leather Loafers,1.05,0.0087,3,10
+SKU0300,Aura Silver Jhumkas,Accessories,Silver Jhumkas,0.16,0.0003,8,25
+SKU0301,Vector Block Heels,Shoes,Block Heels,0.63,0.0082,3,10
+SKU0302,Elara Georgette Saree,Dress,Georgette Saree,0.91,0.0041,5,15
+SKU0303,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.06,0.0001,8,25
+SKU0304,Riya Linen Shirt Dress,Dress,Linen Shirt Dress,0.45,0.0076,5,15
+SKU0305,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,1.06,0.0035,5,15
+SKU0306,Celeste Analog Watch,Accessories,Analog Watch,0.06,0.0004,8,25
+SKU0307,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.14,0.0004,8,25
+SKU0308,Aura Leather Handbag,Accessories,Leather Handbag,0.17,0.019,8,25
+SKU0309,Celeste Analog Watch,Accessories,Analog Watch,0.15,0.0003,8,25
+SKU0310,Eon Analog Watch,Accessories,Analog Watch,0.15,0.0002,8,25
+SKU0311,Riya Cotton Kurta,Dress,Cotton Kurta,0.7,0.0049,5,15
+SKU0312,Riya Linen Shirt Dress,Dress,Linen Shirt Dress,0.58,0.0063,5,15
+SKU0313,Luna Analog Watch,Accessories,Analog Watch,0.13,0.0002,8,25
+SKU0314,Nova Leather Loafers,Shoes,Leather Loafers,0.95,0.0064,3,10
+SKU0315,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,1.08,0.0045,5,15
+SKU0316,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.47,0.003,5,15
+SKU0317,Luna Canvas Belt,Accessories,Canvas Belt,0.89,0.0105,8,25
+SKU0318,Elara Georgette Saree,Dress,Georgette Saree,1.17,0.0033,5,15
+SKU0319,Vector Leather Loafers,Shoes,Leather Loafers,0.78,0.011,3,10
+SKU0320,Eon Canvas Belt,Accessories,Canvas Belt,0.58,0.0171,8,25
+SKU0321,Nova Canvas Sneakers,Shoes,Canvas Sneakers,1.23,0.0126,3,10
+SKU0322,Apex Leather Loafers,Shoes,Leather Loafers,0.55,0.0106,3,10
+SKU0323,Vector Ethnic Juttis,Shoes,Ethnic Juttis,0.89,0.0095,3,10
+SKU0324,Aura Analog Watch,Accessories,Analog Watch,0.11,0.0005,8,25
+SKU0325,Celeste Analog Watch,Accessories,Analog Watch,0.13,0.0001,8,25
+SKU0326,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.77,0.0029,5,15
+SKU0327,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.11,0.0003,8,25
+SKU0328,Apex Ethnic Juttis,Shoes,Ethnic Juttis,1.21,0.008,3,10
+SKU0329,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.91,0.0079,5,15
+SKU0330,Aura Analog Watch,Accessories,Analog Watch,0.15,0.0005,8,25
+SKU0331,Aura Silver Jhumkas,Accessories,Silver Jhumkas,0.14,0.0003,8,25
+SKU0332,Orion Canvas Sneakers,Shoes,Canvas Sneakers,0.53,0.0145,3,10
+SKU0333,Aanya Silk Anarkali,Dress,Silk Anarkali,0.7,0.0045,5,15
+SKU0334,Apex Canvas Sneakers,Shoes,Canvas Sneakers,1.0,0.0111,3,10
+SKU0335,Orion Leather Loafers,Shoes,Leather Loafers,1.02,0.0106,3,10
+SKU0336,Luna Canvas Belt,Accessories,Canvas Belt,0.38,0.0043,8,25
+SKU0337,Eon Analog Watch,Accessories,Analog Watch,0.15,0.0004,8,25
+SKU0338,Orion Block Heels,Shoes,Block Heels,1.46,0.0078,3,10
+SKU0339,Nova Canvas Sneakers,Shoes,Canvas Sneakers,1.27,0.012,3,10
+SKU0340,Eon Canvas Belt,Accessories,Canvas Belt,0.53,0.0116,8,25
+SKU0341,Eon Analog Watch,Accessories,Analog Watch,0.11,0.0005,8,25
+SKU0342,Nova Canvas Sneakers,Shoes,Canvas Sneakers,0.54,0.0146,3,10
+SKU0343,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.89,0.0065,5,15
+SKU0344,Zoya Silk Anarkali,Dress,Silk Anarkali,1.14,0.0062,5,15
+SKU0345,Riya Cotton Kurta,Dress,Cotton Kurta,0.52,0.006,5,15
+SKU0346,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.16,0.0001,8,25
+SKU0347,Riya Cotton Kurta,Dress,Cotton Kurta,0.67,0.0076,5,15
+SKU0348,Orion Block Heels,Shoes,Block Heels,1.26,0.0079,3,10
+SKU0349,Vector Leather Loafers,Shoes,Leather Loafers,1.15,0.0073,3,10
+SKU0350,Celeste Leather Handbag,Accessories,Leather Handbag,0.48,0.0169,8,25
+SKU0351,Elara Georgette Saree,Dress,Georgette Saree,0.47,0.0065,5,15
+SKU0352,Vector Leather Loafers,Shoes,Leather Loafers,0.8,0.011,3,10
+SKU0353,Apex Ethnic Juttis,Shoes,Ethnic Juttis,1.49,0.0104,3,10
+SKU0354,Apex Canvas Sneakers,Shoes,Canvas Sneakers,0.77,0.0131,3,10
+SKU0355,Apex Canvas Sneakers,Shoes,Canvas Sneakers,1.15,0.0122,3,10
+SKU0356,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.81,0.0065,5,15
+SKU0357,Elara Georgette Saree,Dress,Georgette Saree,0.76,0.0025,5,15
+SKU0358,Celeste Leather Handbag,Accessories,Leather Handbag,0.98,0.0101,8,25
+SKU0359,Zoya Cotton Kurta,Dress,Cotton Kurta,0.65,0.0047,5,15
+SKU0360,Nova Ethnic Juttis,Shoes,Ethnic Juttis,1.08,0.0107,3,10
+SKU0361,Orion Ethnic Juttis,Shoes,Ethnic Juttis,0.56,0.0062,3,10
+SKU0362,Apex Canvas Sneakers,Shoes,Canvas Sneakers,1.19,0.0142,3,10
+SKU0363,Aura Analog Watch,Accessories,Analog Watch,0.11,0.0002,8,25
+SKU0364,Riya Georgette Saree,Dress,Georgette Saree,0.71,0.0079,5,15
+SKU0365,Apex Block Heels,Shoes,Block Heels,1.26,0.013,3,10
+SKU0366,Aanya Silk Anarkali,Dress,Silk Anarkali,0.77,0.0052,5,15
+SKU0367,Vector Leather Loafers,Shoes,Leather Loafers,0.56,0.0105,3,10
+SKU0368,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.12,0.0004,8,25
+SKU0369,Aura Canvas Belt,Accessories,Canvas Belt,0.91,0.0095,8,25
+SKU0370,Riya Georgette Saree,Dress,Georgette Saree,0.76,0.0047,5,15
+SKU0371,Zoya Georgette Saree,Dress,Georgette Saree,0.95,0.0044,5,15
+SKU0372,Aanya Silk Anarkali,Dress,Silk Anarkali,0.34,0.0041,5,15
+SKU0373,Aanya Cotton Kurta,Dress,Cotton Kurta,1.19,0.0048,5,15
+SKU0374,Orion Block Heels,Shoes,Block Heels,1.27,0.0127,3,10
+SKU0375,Eon Canvas Belt,Accessories,Canvas Belt,0.99,0.0083,8,25
+SKU0376,Vector Block Heels,Shoes,Block Heels,1.18,0.0116,3,10
+SKU0377,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.11,0.0002,8,25
+SKU0378,Aanya Cotton Kurta,Dress,Cotton Kurta,1.18,0.0048,5,15
+SKU0379,Luna Canvas Belt,Accessories,Canvas Belt,0.84,0.0057,8,25
+SKU0380,Nova Canvas Sneakers,Shoes,Canvas Sneakers,0.69,0.0138,3,10
+SKU0381,Elara Cotton Kurta,Dress,Cotton Kurta,0.85,0.0076,5,15
+SKU0382,Riya Silk Anarkali,Dress,Silk Anarkali,0.36,0.0056,5,15
+SKU0383,Orion Leather Loafers,Shoes,Leather Loafers,1.24,0.009,3,10
+SKU0384,Aanya Silk Anarkali,Dress,Silk Anarkali,0.43,0.008,5,15
+SKU0385,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.51,0.0073,5,15
+SKU0386,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.19,0.0005,8,25
+SKU0387,Elara Georgette Saree,Dress,Georgette Saree,0.34,0.0041,5,15
+SKU0388,Eon Canvas Belt,Accessories,Canvas Belt,0.73,0.0088,8,25
+SKU0389,Orion Block Heels,Shoes,Block Heels,1.25,0.0097,3,10
+SKU0390,Riya Linen Shirt Dress,Dress,Linen Shirt Dress,1.03,0.0075,5,15
+SKU0391,Luna Canvas Belt,Accessories,Canvas Belt,0.6,0.0035,8,25
+SKU0392,Riya Linen Shirt Dress,Dress,Linen Shirt Dress,0.6,0.0025,5,15
+SKU0393,Vector Ethnic Juttis,Shoes,Ethnic Juttis,1.04,0.0133,3,10
+SKU0394,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.91,0.0056,5,15
+SKU0395,Riya Silk Anarkali,Dress,Silk Anarkali,0.73,0.0072,5,15
+SKU0396,Vector Ethnic Juttis,Shoes,Ethnic Juttis,0.71,0.0069,3,10
+SKU0397,Luna Leather Handbag,Accessories,Leather Handbag,0.92,0.0142,8,25
+SKU0398,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.17,0.0003,8,25
+SKU0399,Eon Analog Watch,Accessories,Analog Watch,0.12,0.0001,8,25
+SKU0400,Eon Canvas Belt,Accessories,Canvas Belt,0.92,0.008,8,25
+SKU0401,Orion Leather Loafers,Shoes,Leather Loafers,1.24,0.0052,3,10
+SKU0402,Eon Canvas Belt,Accessories,Canvas Belt,0.24,0.0073,8,25
+SKU0403,Apex Canvas Sneakers,Shoes,Canvas Sneakers,1.05,0.0144,3,10
+SKU0404,Apex Ethnic Juttis,Shoes,Ethnic Juttis,1.47,0.0114,3,10
+SKU0405,Orion Block Heels,Shoes,Block Heels,1.23,0.0085,3,10
+SKU0406,Riya Georgette Saree,Dress,Georgette Saree,1.13,0.0053,5,15
+SKU0407,Aura Leather Handbag,Accessories,Leather Handbag,0.86,0.0024,8,25
+SKU0408,Aura Leather Handbag,Accessories,Leather Handbag,0.47,0.017,8,25
+SKU0409,Riya Cotton Kurta,Dress,Cotton Kurta,0.31,0.005,5,15
+SKU0410,Apex Leather Loafers,Shoes,Leather Loafers,1.16,0.0052,3,10
+SKU0411,Aura Canvas Belt,Accessories,Canvas Belt,0.12,0.0147,8,25
+SKU0412,Aura Analog Watch,Accessories,Analog Watch,0.11,0.0005,8,25
+SKU0413,Aanya Cotton Kurta,Dress,Cotton Kurta,0.77,0.0034,5,15
+SKU0414,Eon Analog Watch,Accessories,Analog Watch,0.11,0.0003,8,25
+SKU0415,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.06,0.0005,8,25
+SKU0416,Aura Leather Handbag,Accessories,Leather Handbag,0.46,0.0082,8,25
+SKU0417,Vector Leather Loafers,Shoes,Leather Loafers,1.2,0.0058,3,10
+SKU0418,Vector Ethnic Juttis,Shoes,Ethnic Juttis,1.39,0.0142,3,10
+SKU0419,Elara Silk Anarkali,Dress,Silk Anarkali,0.54,0.0075,5,15
+SKU0420,Aura Analog Watch,Accessories,Analog Watch,0.05,0.0002,8,25
+SKU0421,Aanya Georgette Saree,Dress,Georgette Saree,0.57,0.0054,5,15
+SKU0422,Eon Canvas Belt,Accessories,Canvas Belt,0.45,0.0151,8,25
+SKU0423,Eon Leather Handbag,Accessories,Leather Handbag,0.15,0.0093,8,25
+SKU0424,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,1.17,0.004,5,15
+SKU0425,Luna Analog Watch,Accessories,Analog Watch,0.19,0.0003,8,25
+SKU0426,Aura Canvas Belt,Accessories,Canvas Belt,0.79,0.0066,8,25
+SKU0427,Aanya Cotton Kurta,Dress,Cotton Kurta,0.54,0.0043,5,15
+SKU0428,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.05,0.0002,8,25
+SKU0429,Vector Ethnic Juttis,Shoes,Ethnic Juttis,0.63,0.0069,3,10
+SKU0430,Vector Block Heels,Shoes,Block Heels,0.53,0.0085,3,10
+SKU0431,Elara Linen Shirt Dress,Dress,Linen Shirt Dress,0.31,0.0045,5,15
+SKU0432,Riya Silk Anarkali,Dress,Silk Anarkali,0.92,0.003,5,15
+SKU0433,Nova Ethnic Juttis,Shoes,Ethnic Juttis,0.99,0.0056,3,10
+SKU0434,Apex Ethnic Juttis,Shoes,Ethnic Juttis,0.8,0.0128,3,10
+SKU0435,Orion Ethnic Juttis,Shoes,Ethnic Juttis,1.22,0.01,3,10
+SKU0436,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.19,0.0002,8,25
+SKU0437,Eon Canvas Belt,Accessories,Canvas Belt,0.5,0.0092,8,25
+SKU0438,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.08,0.0002,8,25
+SKU0439,Nova Ethnic Juttis,Shoes,Ethnic Juttis,1.23,0.0113,3,10
+SKU0440,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.11,0.0001,8,25
+SKU0441,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.19,0.0003,8,25
+SKU0442,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.06,0.0004,8,25
+SKU0443,Orion Block Heels,Shoes,Block Heels,1.13,0.0074,3,10
+SKU0444,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.2,0.0003,8,25
+SKU0445,Vector Block Heels,Shoes,Block Heels,1.29,0.0086,3,10
+SKU0446,Aura Leather Handbag,Accessories,Leather Handbag,0.79,0.0135,8,25
+SKU0447,Vector Canvas Sneakers,Shoes,Canvas Sneakers,1.06,0.0115,3,10
+SKU0448,Eon Canvas Belt,Accessories,Canvas Belt,0.97,0.0092,8,25
+SKU0449,Zoya Cotton Kurta,Dress,Cotton Kurta,0.5,0.0065,5,15
+SKU0450,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.15,0.0004,8,25
+SKU0451,Aanya Linen Shirt Dress,Dress,Linen Shirt Dress,0.73,0.0038,5,15
+SKU0452,Riya Cotton Kurta,Dress,Cotton Kurta,0.61,0.0041,5,15
+SKU0453,Zoya Georgette Saree,Dress,Georgette Saree,0.73,0.0046,5,15
+SKU0454,Eon Canvas Belt,Accessories,Canvas Belt,0.16,0.0018,8,25
+SKU0455,Aura Leather Handbag,Accessories,Leather Handbag,0.86,0.0133,8,25
+SKU0456,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.1,0.0003,8,25
+SKU0457,Apex Canvas Sneakers,Shoes,Canvas Sneakers,1.13,0.0069,3,10
+SKU0458,Luna Canvas Belt,Accessories,Canvas Belt,0.13,0.0127,8,25
+SKU0459,Elara Georgette Saree,Dress,Georgette Saree,0.65,0.0062,5,15
+SKU0460,Aanya Linen Shirt Dress,Dress,Linen Shirt Dress,0.82,0.0068,5,15
+SKU0461,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.09,0.0004,8,25
+SKU0462,Luna Analog Watch,Accessories,Analog Watch,0.1,0.0004,8,25
+SKU0463,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.15,0.0002,8,25
+SKU0464,Aanya Linen Shirt Dress,Dress,Linen Shirt Dress,0.46,0.0062,5,15
+SKU0465,Luna Canvas Belt,Accessories,Canvas Belt,0.64,0.0119,8,25
+SKU0466,Apex Canvas Sneakers,Shoes,Canvas Sneakers,1.14,0.0119,3,10
+SKU0467,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.1,0.0003,8,25
+SKU0468,Aanya Linen Shirt Dress,Dress,Linen Shirt Dress,0.74,0.0032,5,15
+SKU0469,Apex Block Heels,Shoes,Block Heels,1.18,0.0092,3,10
+SKU0470,Orion Block Heels,Shoes,Block Heels,0.58,0.0053,3,10
+SKU0471,Aanya Linen Shirt Dress,Dress,Linen Shirt Dress,0.55,0.0052,5,15
+SKU0472,Elara Georgette Saree,Dress,Georgette Saree,0.79,0.0027,5,15
+SKU0473,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.79,0.0065,5,15
+SKU0474,Celeste Canvas Belt,Accessories,Canvas Belt,0.99,0.0029,8,25
+SKU0475,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.09,0.0004,8,25
+SKU0476,Aanya Georgette Saree,Dress,Georgette Saree,1.0,0.0034,5,15
+SKU0477,Luna Analog Watch,Accessories,Analog Watch,0.08,0.0002,8,25
+SKU0478,Zoya Linen Shirt Dress,Dress,Linen Shirt Dress,0.84,0.003,5,15
+SKU0479,Eon Analog Watch,Accessories,Analog Watch,0.13,0.0005,8,25
+SKU0480,Elara Silk Anarkali,Dress,Silk Anarkali,1.13,0.008,5,15
+SKU0481,Celeste Silver Jhumkas,Accessories,Silver Jhumkas,0.17,0.0004,8,25
+SKU0482,Luna Canvas Belt,Accessories,Canvas Belt,0.23,0.013,8,25
+SKU0483,Luna Canvas Belt,Accessories,Canvas Belt,0.51,0.013,8,25
+SKU0484,Zoya Georgette Saree,Dress,Georgette Saree,0.93,0.0073,5,15
+SKU0485,Nova Block Heels,Shoes,Block Heels,1.08,0.0137,3,10
+SKU0486,Luna Leather Handbag,Accessories,Leather Handbag,0.67,0.0142,8,25
+SKU0487,Riya Georgette Saree,Dress,Georgette Saree,1.17,0.0069,5,15
+SKU0488,Nova Ethnic Juttis,Shoes,Ethnic Juttis,1.33,0.0084,3,10
+SKU0489,Luna Silver Jhumkas,Accessories,Silver Jhumkas,0.16,0.0001,8,25
+SKU0490,Aura Canvas Belt,Accessories,Canvas Belt,0.21,0.0173,8,25
+SKU0491,Vector Block Heels,Shoes,Block Heels,1.49,0.0093,3,10
+SKU0492,Eon Silver Jhumkas,Accessories,Silver Jhumkas,0.09,0.0004,8,25
+SKU0493,Nova Leather Loafers,Shoes,Leather Loafers,1.16,0.0115,3,10
+SKU0494,Zoya Georgette Saree,Dress,Georgette Saree,0.95,0.0065,5,15
+SKU0495,Vector Leather Loafers,Shoes,Leather Loafers,0.5,0.0098,3,10
+SKU0496,Elara Silk Anarkali,Dress,Silk Anarkali,0.31,0.0062,5,15
+SKU0497,Riya Georgette Saree,Dress,Georgette Saree,0.73,0.0034,5,15
+SKU0498,Aanya Cotton Kurta,Dress,Cotton Kurta,0.58,0.0073,5,15
+SKU0499,Riya Georgette Saree,Dress,Georgette Saree,0.88,0.0061,5,15
+SKU0500,Riya Cotton Kurta,Dress,Cotton Kurta,0.7,0.0063,5,15
