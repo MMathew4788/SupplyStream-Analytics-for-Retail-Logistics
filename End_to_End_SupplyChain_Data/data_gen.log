@@ -38,3 +38,23 @@
 2025-07-04 12:06:53,812 INFO Saved link_shipment_orders.csv (10073 rows)
 2025-07-04 12:06:53,814 INFO Saved fact_returns.csv (705 rows)
 2025-07-04 12:06:53,814 INFO Data generation complete. Output directory: End_to_End_SupplyChain_Data
+2025-07-05 13:19:00,134 INFO Generated hubs: 3
+2025-07-05 13:19:00,138 INFO Generated stores: 64
+2025-07-05 13:19:00,139 INFO Generated products: 500
+2025-07-05 13:19:00,140 INFO Generated suppliers: 20
+2025-07-05 13:19:00,971 INFO Inbound shipments: 4200
+2025-07-05 13:19:02,207 INFO Inventory snapshots: 828000 records
+2025-07-05 13:19:03,327 INFO Orders: 6000
+2025-07-05 13:19:04,685 INFO Shipment legs: 7794
+2025-07-05 13:19:04,749 INFO Returns: 705
+2025-07-05 13:19:04,753 INFO Saved dim_hubs.csv (3 rows)
+2025-07-05 13:19:04,755 INFO Saved dim_stores.csv (64 rows)
+2025-07-05 13:19:04,757 INFO Saved dim_products.csv (500 rows)
+2025-07-05 13:19:04,758 INFO Saved dim_suppliers.csv (20 rows)
+2025-07-05 13:19:05,571 INFO Saved fact_inventory_snapshot.csv (828000 rows)
+2025-07-05 13:19:05,587 INFO Saved fact_inbound_shipments.csv (4200 rows)
+2025-07-05 13:19:05,599 INFO Saved fact_orders.csv (6000 rows)
+2025-07-05 13:19:05,632 INFO Saved fact_shipments.csv (7794 rows)
+2025-07-05 13:19:05,639 INFO Saved link_shipment_orders.csv (10073 rows)
+2025-07-05 13:19:05,641 INFO Saved fact_returns.csv (705 rows)
+2025-07-05 13:19:05,641 INFO Data generation complete. Output directory: End_to_End_SupplyChain_Data
