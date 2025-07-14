@@ -1,22 +1,24 @@
-2025-07-14 08:16:52,976 INFO Generated hubs: 3
-2025-07-14 08:16:52,978 INFO Generated stores: 73
-2025-07-14 08:16:52,980 INFO Generated products: 500
-2025-07-14 08:16:52,981 INFO Generated suppliers: 20
-2025-07-14 08:16:54,278 INFO Orders: 6000
-2025-07-14 08:16:56,184 INFO Shipment legs: 7828
-2025-07-14 08:16:56,188 INFO Reorders generated: 0
-2025-07-14 08:16:57,066 INFO Inbound shipments: 708
-2025-07-14 08:16:58,797 INFO Inventory snapshots: 828000
-2025-07-14 08:16:58,854 INFO Returns: 708
-2025-07-14 08:16:58,877 INFO Saved dim_hubs.csv (3 rows)
-2025-07-14 08:16:58,878 INFO Saved dim_stores.csv (73 rows)
-2025-07-14 08:16:58,883 INFO Saved dim_products.csv (500 rows)
-2025-07-14 08:16:58,885 INFO Saved dim_suppliers.csv (20 rows)
-2025-07-14 08:16:58,897 INFO Saved fact_orders.csv (6000 rows)
-2025-07-14 08:16:58,940 INFO Saved fact_shipments.csv (7828 rows)
-2025-07-14 08:16:58,948 INFO Saved link_shipment_orders.csv (10110 rows)
-2025-07-14 08:16:58,950 INFO Saved fact_unfulfilled_orders.csv (0 rows)
-2025-07-14 08:16:58,952 INFO Saved fact_inbound_shipments.csv (708 rows)
-2025-07-14 08:16:59,919 INFO Saved fact_inventory_snapshot.csv (828000 rows)
-2025-07-14 08:16:59,940 INFO Saved fact_returns.csv (708 rows)
-2025-07-14 08:16:59,940 INFO Data generation complete.
+2025-07-14 16:38:22,739 INFO Generated hubs: 3
+2025-07-14 16:38:22,744 INFO Generated stores: 73
+2025-07-14 16:38:22,746 INFO Generated products: 500
+2025-07-14 16:38:22,747 INFO Generated suppliers: 20
+2025-07-14 16:38:23,891 INFO Orders: 6000
+2025-07-14 16:38:24,142 INFO Shipment fill rate: 83.59%
+2025-07-14 16:38:24,143 INFO Unfulfilled lines: 925
+2025-07-14 16:38:25,360 INFO Shipment legs: 6956
+2025-07-14 16:38:25,486 INFO Reorder shipments: 925
+2025-07-14 16:38:26,244 INFO Inbound shipments (threshold): 706
+2025-07-14 16:38:28,066 INFO Inventory snapshots: 828000
+2025-07-14 16:38:28,122 INFO Returns: 610
+2025-07-14 16:38:28,144 INFO Saved dim_hubs.csv (3 rows)
+2025-07-14 16:38:28,146 INFO Saved dim_stores.csv (73 rows)
+2025-07-14 16:38:28,150 INFO Saved dim_products.csv (500 rows)
+2025-07-14 16:38:28,151 INFO Saved dim_suppliers.csv (20 rows)
+2025-07-14 16:38:28,168 INFO Saved fact_orders.csv (6000 rows)
+2025-07-14 16:38:28,202 INFO Saved fact_shipments.csv (6956 rows)
+2025-07-14 16:38:28,212 INFO Saved link_shipment_orders.csv (8716 rows)
+2025-07-14 16:38:28,215 INFO Saved fact_unfulfilled_orders.csv (925 rows)
+2025-07-14 16:38:28,221 INFO Saved fact_inbound_shipments.csv (1631 rows)
+2025-07-14 16:38:29,202 INFO Saved fact_inventory_snapshot.csv (828000 rows)
+2025-07-14 16:38:29,206 INFO Saved fact_returns.csv (610 rows)
+2025-07-14 16:38:29,206 INFO Data generation complete. Directory: End_to_End_SupplyChain_Data
