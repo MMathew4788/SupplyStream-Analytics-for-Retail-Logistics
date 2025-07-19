@@ -1,0 +1,16 @@
+2025-07-19 22:54:44,155 INFO Hubs: 3
+2025-07-19 22:54:44,156 INFO Stores: 59
+2025-07-19 22:54:44,159 INFO Products: 500
+2025-07-19 22:54:44,161 INFO Suppliers: 20
+2025-07-19 22:54:44,172 INFO Seeded inventory: 500 hub-SKU pairs
+2025-07-19 22:54:53,438 INFO Saved dim_hubs.csv (3 rows)
+2025-07-19 22:54:53,439 INFO Saved dim_stores.csv (59 rows)
+2025-07-19 22:54:53,441 INFO Saved dim_products.csv (500 rows)
+2025-07-19 22:54:53,442 INFO Saved dim_suppliers.csv (20 rows)
+2025-07-19 22:54:53,452 INFO Saved fact_orders.csv (6031 rows)
+2025-07-19 22:54:53,466 INFO Saved fact_shipments.csv (5939 rows)
+2025-07-19 22:54:53,471 INFO Saved link_shipment_orders.csv (6031 rows)
+2025-07-19 22:54:53,473 INFO Saved fact_inbound_shipments.csv (178 rows)
+2025-07-19 22:54:54,092 INFO Saved fact_inventory_snapshot.csv (638500 rows)
+2025-07-19 22:54:54,094 INFO Saved fact_returns.csv (442 rows)
+2025-07-19 22:54:54,094 INFO Generation complete.
