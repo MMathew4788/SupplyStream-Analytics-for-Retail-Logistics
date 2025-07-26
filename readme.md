@@ -1,72 +1,213 @@
-# SupplyStream: Synthetic Supply Chain Data Generator
+# 📦 SupplyStream: Synthetic Retail Supply Chain Simulator + Analytics Dashboard
 
-## Overview
+## ✨ Overview
 
-This code generates synthetic supply chain datasets for retail logistics, focused on an Indian apparel, shoes, and accessories business. It simulates a hub-and-spoke model with cross-docking, inventory management, orders, shipments, returns, and inbound logistics. The data is realistic, incorporating seasonality, stochastic demand (Poisson distribution), lead times, and supplier reliability.
+This repo have a Python-based simulator that generates realistic supply chain datasets tailored for an Indian retail business selling apparel, shoes, and accessories. Built on a hub-and-spoke model with cross-docking, this framework feeds directly into a Power BI dashboard for performance tracking across fulfillment, delivery, inventory, transport costs, and reverse logistics.
 
-This script is ideal for:
+Designed for:
 
-- Testing analytics dashboards (e.g., Power BI, Tableau).
-- Training ML models on supply chain data.
-- Educational purposes in logistics and operations research.
+- 📊 Dashboard prototyping (Power BI, Tableau)
+- 🧠 Machine learning model training
+- 🎓 Educational use in operations, logistics, analytics
 
-Key features:
+---
 
-- **Hub-and-Spoke with Cross-Docking**: Hubs act as warehouses and cross-docks for multi-category orders.
-- **Stochastic Elements**: Demand variability, returns (3-6%), lead times (3-14 days), and supplier reliability (85-98% on-time delivery).
-- **Output**: CSV files for dimensions (hubs, stores, products, suppliers) and facts (orders, shipments, inventory snapshots, returns, inbound shipments).
+## 🛠️ Architecture Summary
 
-## Installation
+```
+Python Data generation → SupplyChain_Data/*.csv → GitHub Raw URLs → Power BI DAX Modeling → Data Visualization
+```
 
-1. **Prerequisites**:
+---
 
-   - Python 3.8+
-   - Required libraries: `numpy`, `pandas`, `faker`
+## 🚚 Logistic Model
 
-   Install via pip:
-   pip install numpy pandas faker
+This synthetic framework mimics a multi-echelon, multi-SKU retail network:
 
-2. **Clone the Repository**:
-   git clone https://github.com/MMathew4788/SupplyStream-Analytics-for-Retail-Logistics.git
-   cd SupplyStream-Analytics-for-Retail-Logistics
+- Hubs serve as central replenishment points, using continuous review inventory logic (s, Q) with safety stock anchored to service level.
+- Stores draw stock via cross-docking or direct shipment, capturing variability from seasonality, weekday effects, and store size factors.
+- Transport flows distinguish inter-hub bulk truck legs from final-mile courier legs, applying realistic costing and lead-time distributions.
+- Returns logic inserts post-delivery reversals, making the dataset suitable for reverse-logistics analysis.
 
-## Usage
+#### Shipment & Transportation Logic
 
-1. **Run the Script**:
-   python generate_data.py
+The model simulates two transport tiers:
 
-- This generates data in the `SupplyChain_Data/` directory.
-- Logs are saved to `SupplyChain_Data/data_gen.log`.
+##### Inter-Hub Shipments
 
-2. **Configuration** (Edit `CFG` in the script):
+- Legs: Dispatch to hub cross-dock, transit 1–3 days by truck.
+- Cost = ₹300 + ₹15/km + ₹8·chargeable_kg, with 1.2× multiplier for bulk inter-hub.
+- Distances for DEL-BOM, DEL-BLR, BOM-BLR are hard-coded; others are randomized.
 
-- `NUM_STORES`: Number of stores (default: 100).
-- `NUM_PRODUCTS`: Number of SKUs (default: 500).
-- `NUM_SUPPLIERS`: Number of suppliers (default: 20).
-- `NUM_ORDERS`: Total orders over the period (default: 50,000 for realism).
-- `START_DATE` / `END_DATE`: Simulation period (default: 2022-01-01 to 2025-06-30).
-- Other params: Lead times, service factors, etc.
+##### Final-Mile Shipments
 
-3. **Output Files**:
+- Direct store shipments: local pick if all lines from same hub or cross-docked consolidation.
+- Delivery lead time = 1 day, distance 20–120 km by courier.
+- Cost uses the same cost function without the inter-hub multiplier.
 
-- **Dimensions**: `dim_hubs.csv`, `dim_stores.csv`, `dim_products.csv`, `dim_suppliers.csv`.
-- **Facts**: `fact_orders.csv` (order lines), `fact_shipments.csv` (shipment legs), `link_shipment_orders.csv` (links), `fact_inbound_shipments.csv` (supplier deliveries), `fact_inventory_snapshot.csv` (daily stock), `fact_returns.csv` (returns).
+##### Returns are simulated with a 3–6% chance per line, random quantity, and category-based reason probabilities.
 
-## How It Works
+---
 
-- **Simulation Loop**: Runs daily from start to end date.
-- Generates multi-line orders with seasonal demand.
-- Handles cross-docking: Inter-hub shipments for non-local items, consolidation at home hub, then final-mile delivery.
-- Inventory: Reorders when below ROP, with lead times and reliability-based delays.
-- Returns: 3-6% rate, limited to "Wrong Size" or "Wrong Colour".
-- **Realism**: Based on Indian geography (e.g., distances Delhi-Mumbai: 1400km), courier costs (₹300 base + ₹15/km), and retail trends (e.g., festival spikes in October).
+## 🏗️ Synthetic Data Generator
 
-## Contributing
+### 📂 Output Structure
 
-1. Fork the repo.
-2. Create a feature branch (`git checkout -b feature/new-feature`).
-3. Commit changes (`git commit -am 'Add new feature'`).
-4. Push to the branch (`git push origin feature/new-feature`).
-5. Open a Pull Request.
+| Type       | Files                                                                                                          |
+| ---------- | -------------------------------------------------------------------------------------------------------------- | --- | ----- | ------------------------ |
+| Dimensions | dim_hubs.csv, dim_stores.csv, dim_products.csv, dim_suppliers.csv                                              |
+| Facts      | fact_orders.csv, fact_shipments.csv, fact_inventory_snapshot.csv, fact_returns.csv, fact_inbound_shipments.csv |     | Links | link_shipment_orders.csv |
+| Logs       | SupplyChain_Data/data_gen.log                                                                                  |
 
-For issues or suggestions, open a GitHub issue!
+### ⚙️ Simulation Parameters (CFG block)
+
+- NUM_STORES, NUM_PRODUCTS, NUM_SUPPLIERS, NUM_ORDERS
+- START_DATE, END_DATE
+- Lead times (inter-hub, final-mile, inbound)
+- Reorder points (ROP), return rates, supplier reliability
+
+### 🧮 Modeling Assumptions
+
+- Poisson-distributed demand with seasonal spikes
+- Realistic logistics modeling (e.g., Delhi-Mumbai shipping distances)
+- Supplier variability: 85–98% reliability
+- Returns categorized by cause (“Wrong Size”, “Wrong Colour”)
+- Courier costing: ₹300 base + ₹15/km distance
+
+### 🚀 How to Run
+
+- #### Install dependencies
+
+```
+pip install numpy pandas faker
+```
+
+- #### Clone and run
+
+```
+git clone https://github.com/MMathew4788/SupplyStream-Analytics-for-Retail-Logistics.git
+
+cd SupplyStream-Analytics-for-Retail-Logistics
+
+python generate_data.py
+
+```
+
+## 🌐 Hosting CSV Files via GitHub
+
+Once generated, upload `SupplyChain_Data/*.csv` to your GitHub repository. Access the raw file links like:
+https://raw.githubusercontent.com/your-username/repo-name/main/SupplyChain_Data/fact_orders.csv
+
+---
+
+## 📊 Power BI Dashboard – Analytics Layer
+
+### 🔧 Data Import
+
+- Open Power BI Desktop
+- Use Get Data → Web
+- Paste GitHub raw URL for each CSV
+- Name your tables clearly (fact_orders, dim_products, etc.)
+- Define relationships in Model View
+
+### 🗂️ Manage Relationships
+
+| Table Name                                 | Relationship Type | Related Table                        |
+| ------------------------------------------ | ----------------- | ------------------------------------ |
+| `fact_inbound_shipments` (`SKU`)           | \* → 1            | `dim_products` (`SKU`)               |
+| `fact_inbound_shipments` (`Supplier_ID`)   | \* → 1            | `dim_suppliers` (`Supplier_ID`)      |
+| `fact_inventory_snapshot` (`Hub_ID`)       | \* → 1            | `dim_hubs` (`Hub_ID`)                |
+| `fact_inventory_snapshot` (`SKU`)          | \* → 1            | `dim_products` (`SKU`)               |
+| `fact_orders` (`SKU`)                      | \* → 1            | `dim_products` (`SKU`)               |
+| `fact_orders` (`Store_ID`)                 | \* → 1            | `dim_stores` (`Store_ID`)            |
+| `fact_returns` (`Order_Line_ID`)           | 1 ↔ 1             | `fact_orders` (`Order_Line_ID`)      |
+| `fact_shipments` (`Origin`)                | \* → 1            | `dim_hubs` (`Hub_ID`)                |
+| `link_shipment_orders` (`Order_Line_ID`)   | \* → 1            | `fact_orders` (`Order_Line_ID`)      |
+| `link_shipment_orders` (`Shipment_Leg_ID`) | \* → 1            | `fact_shipments` (`Shipment_Leg_ID`) |
+
+---
+
+### 📐 DAX Measures
+
+#### 🚚 Order Fulfillment
+
+```
+Total Quantity Ordered = SUM('fact_orders'[Quantity_Ordered])
+Total Quantity Shipped = SUM('fact_orders'[Quantity_Shipped])
+Order Fulfillment Rate % = DIVIDE([Total Quantity Shipped], [Total Quantity Ordered], 0)
+```
+
+#### 🕒 Delivery Performance
+
+```
+Actual Delivery Date =
+MAXX(
+    FILTER(link_shipment_orders, RELATED(fact_shipments[Leg_Type]) = "Final-Mile"),
+    RELATED(fact_shipments[Arrival_Date])
+)
+
+Number of On Time Deliveries =
+COUNTROWS(
+    FILTER(
+        ADDCOLUMNS(fact_orders, "ActDate", [Actual Delivery Date]),
+        [ActDate] <= fact_orders[Required_Delivery_Date]
+    )
+)
+
+On Time Delivery % = DIVIDE([Number of On Time Deliveries], COUNTROWS(fact_orders), 0)
+```
+
+#### 🧮 Inventory Insights
+
+```
+Stockout Risk =
+COUNTROWS(
+    FILTER(
+        fact_inventory_snapshot,
+        fact_inventory_snapshot[Quantity_On_Hand] < RELATED(dim_products[ROP])
+    )
+)
+
+Average Product On Hand =
+AVERAGEX(
+    SUMMARIZE(fact_inventory_snapshot, fact_inventory_snapshot[SKU]),
+    CALCULATE(AVERAGE(fact_inventory_snapshot[Quantity_On_Hand]))
+)
+```
+
+#### 🚛 Transport Economics
+
+```
+Total Transport Cost = SUM(fact_shipments[Transportation_Cost])
+Cost Per Unit =
+DIVIDE(
+    [Total Transport Cost],
+    SUM(link_shipment_orders[Quantity_Shipped]),
+    0
+)
+```
+
+#### 🔁 Returns & Reverse Logistics
+
+```
+Total Returns = COUNTROWS(fact_returns)
+
+Return Rate % =
+DIVIDE(
+    SUM(fact_returns[Quantity_Returned]),
+    SUM(fact_orders[Quantity_Shipped]),
+    0
+) * 100
+```
+
+### 📦 Project File Reference
+
+The `Analysis.pbix` file is available in the root folder of this repository.
+
+---
+
+## 🙌 Contribute, Fork, and Share
+
+If you find this project useful, feel free to **star ⭐**, **fork 🍴**, or adapt it for your own supply chain analytics workflows. Contributions, enhancements, and feedback are always welcome.
+
+Let’s make retail logistics smarter, together 🚀
