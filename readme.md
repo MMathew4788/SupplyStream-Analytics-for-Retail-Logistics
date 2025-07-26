@@ -22,12 +22,22 @@ Python Data generation → SupplyChain_Data/*.csv → GitHub Raw URLs → Power 
 
 ## 🚚 Logistic Model
 
-This synthetic framework mimics a multi-echelon, multi-SKU retail network:
+#### Network Topology
 
-- Hubs serve as central replenishment points, using continuous review inventory logic (s, Q) with safety stock anchored to service level.
-- Stores draw stock via cross-docking or direct shipment, capturing variability from seasonality, weekday effects, and store size factors.
-- Transport flows distinguish inter-hub bulk truck legs from final-mile courier legs, applying realistic costing and lead-time distributions.
-- Returns logic inserts post-delivery reversals, making the dataset suitable for reverse-logistics analysis.
+- 20 specialized suppliers mapped to key manufacturing clusters
+- 3 regional hubs:
+  HUB-DEL (Apparel), HUB-BOM (Footwear), HUB-BLR (Accessories)
+- ~100 stores (major/minor) assigned to a “home” hub
+
+#### Demand Generation
+
+- ~40 daily orders (Poisson process) over Jan 2022–Jun 2025
+- Seasonality factors: quarter, month, weekday
+- Multi-SKU orders (1–5 lines), 3–10 day delivery window
+- Inventory & Replenishment
+- Reorder Point (ROP) = lead-time demand + safety stock (95% service level)
+- Lead times sampled 3–14 days (μ=7, σ=2)
+- Single inbound batch per hub when any SKU falls below ROP
 
 #### Shipment & Transportation Logic
 
