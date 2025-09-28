@@ -452,7 +452,7 @@ def main():
                     "Destination_Hub_ID":   hub,
                     "SKU":                  sku,
                     "Quantity_Received":    need,
-                    "Expected_Arrival_Date":today,
+                    "Expected_Arrival_Date":today + timedelta(days=lt - random.randint(0, 5)),
                     "Actual_Arrival_Date":  today + timedelta(days=lt)
                 }
                 pending_inb.append(ev)
