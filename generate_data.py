@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-V15.6 – Bug Fixes for KeyError on Quantity_Shipped and Scope Issues
-Updated with Cross-Docking, Returns Adjustments, Consistency Improvements, and Realistic Params
-"""
 
 import logging, random
 from datetime import datetime, timedelta, date
@@ -194,15 +190,17 @@ def gen_suppliers()->Tuple[pd.DataFrame,pd.DataFrame]:
 # ----------------------------------------------------------------------------
 # 4. INITIAL INVENTORY
 # ----------------------------------------------------------------------------
-def seed_inventory(
-    hubs:pd.DataFrame, prods:pd.DataFrame
-)->Dict[Tuple[str,str],int]:
+def seed_inventory(hubs: pd.DataFrame, prods: pd.DataFrame) -> Dict[Tuple[str, str], int]:
     m = hubs.set_index("Specialty")["Hub_ID"].to_dict()
-    inv={}
-    for _,r in prods.iterrows():
-        inv[(m[r.Category], r.SKU)] = random.randint(100,400)
+    # Precompute SKU -> Target_Level for O(1) lookups instead of per-iteration .loc
+    target_map = prods.set_index("SKU")["Target_Level"].to_dict()
+    inv = {}
+    for _, r in prods.iterrows():
+        tgt = target_map[r.SKU]
+        inv[(m[r.Category], r.SKU)] = int(tgt * random.uniform(0.9, 1.1))
     log.info("Seeded inventory: %d hub-SKU pairs", len(inv))
     return inv
+
 
 # ----------------------------------------------------------------------------
 # 5. DAILY PIPELINE

@@ -1,16 +1,16 @@
-2025-09-28 05:30:55,025 INFO Hubs: 3
-2025-09-28 05:30:55,026 INFO Stores: 59
-2025-09-28 05:30:55,029 INFO Products: 500
-2025-09-28 05:30:55,031 INFO Suppliers: 20
-2025-09-28 05:30:55,045 INFO Seeded inventory: 500 hub-SKU pairs
-2025-09-28 05:36:06,102 INFO Saved dim_hubs.csv (3 rows)
-2025-09-28 05:36:06,103 INFO Saved dim_stores.csv (59 rows)
-2025-09-28 05:36:06,105 INFO Saved dim_products.csv (500 rows)
-2025-09-28 05:36:06,106 INFO Saved dim_suppliers.csv (20 rows)
-2025-09-28 05:36:06,383 INFO Saved fact_orders.csv (151175 rows)
-2025-09-28 05:36:06,710 INFO Saved fact_shipments.csv (151121 rows)
-2025-09-28 05:36:06,834 INFO Saved link_shipment_orders.csv (251737 rows)
-2025-09-28 05:36:06,855 INFO Saved fact_inbound_shipments.csv (12153 rows)
-2025-09-28 05:36:07,441 INFO Saved fact_inventory_snapshot.csv (638500 rows)
-2025-09-28 05:36:07,454 INFO Saved fact_returns.csv (6879 rows)
-2025-09-28 05:36:07,454 INFO Generation complete.
+2025-10-02 06:43:39,215 INFO Hubs: 3
+2025-10-02 06:43:39,225 INFO Stores: 59
+2025-10-02 06:43:39,234 INFO Products: 500
+2025-10-02 06:43:39,239 INFO Suppliers: 20
+2025-10-02 06:43:39,257 INFO Seeded inventory: 500 hub-SKU pairs
+2025-10-02 06:49:23,650 INFO Saved dim_hubs.csv (3 rows)
+2025-10-02 06:49:23,652 INFO Saved dim_stores.csv (59 rows)
+2025-10-02 06:49:23,655 INFO Saved dim_products.csv (500 rows)
+2025-10-02 06:49:23,656 INFO Saved dim_suppliers.csv (20 rows)
+2025-10-02 06:49:24,004 INFO Saved fact_orders.csv (152240 rows)
+2025-10-02 06:49:24,356 INFO Saved fact_shipments.csv (151845 rows)
+2025-10-02 06:49:24,499 INFO Saved link_shipment_orders.csv (253182 rows)
+2025-10-02 06:49:24,526 INFO Saved fact_inbound_shipments.csv (13164 rows)
+2025-10-02 06:49:25,178 INFO Saved fact_inventory_snapshot.csv (638500 rows)
+2025-10-02 06:49:25,194 INFO Saved fact_returns.csv (6807 rows)
+2025-10-02 06:49:25,194 INFO Generation complete.

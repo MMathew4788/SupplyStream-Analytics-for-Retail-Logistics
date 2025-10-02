@@ -63,8 +63,8 @@ The model simulates two transport tiers:
 
 ### 📂 Output Structure
 
-| Type       | Files               
-|--------|--------
+| Type       | Files                                                                                                          |
+| ---------- | -------------------------------------------------------------------------------------------------------------- | --- | ----- | ------------------------ |
 | Dimensions | dim_hubs.csv, dim_stores.csv, dim_products.csv, dim_suppliers.csv                                              |
 | Facts      | fact_orders.csv, fact_shipments.csv, fact_inventory_snapshot.csv, fact_returns.csv, fact_inbound_shipments.csv |     | Links | link_shipment_orders.csv |
 | Logs       | SupplyChain_Data/data_gen.log                                                                                  |
@@ -208,6 +208,28 @@ DIVIDE(
     SUM(fact_orders[Quantity_Shipped]),
     0
 ) * 100
+```
+
+### Inbound Supplier Performance
+
+```
+OnTimeDeliveryRate =
+    DIVIDE(
+        COUNTROWS(
+            FILTER(
+                fact_inbound_shipments,
+                fact_inbound_shipments[Delay Days]=0
+            )
+        ),
+        COUNTROWS(fact_inbound_shipments)
+    )
+
+```
+
+```
+Avg Inbound Lead Time =
+AVERAGEX(fact_inbound_shipments, DATEDIFF(fact_inbound_shipments[Expected_Arrival_Date],
+fact_inbound_shipments[Actual_Arrival_Date],DAY))
 ```
 
 ### 📦 Project File Reference
