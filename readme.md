@@ -1,4 +1,4 @@
-# 📦 SupplyStream: Synthetic Retail Supply Chain Simulator + Analytics Dashboard
+## 📦 SupplyStream: Synthetic Retail Supply Chain Simulator + Analytics Dashboard
 
 ## ✨ Overview
 
@@ -61,14 +61,6 @@ The model simulates two transport tiers:
 
 ## 🏗️ Synthetic Data Generator
 
-### 📂 Output Structure
-
-| Type       | Files                                                                                                          |
-| ---------- | -------------------------------------------------------------------------------------------------------------- | --- | ----- | ------------------------ |
-| Dimensions | dim_hubs.csv, dim_stores.csv, dim_products.csv, dim_suppliers.csv                                              |
-| Facts      | fact_orders.csv, fact_shipments.csv, fact_inventory_snapshot.csv, fact_returns.csv, fact_inbound_shipments.csv |     | Links | link_shipment_orders.csv |
-| Logs       | SupplyChain_Data/data_gen.log                                                                                  |
-
 ### ⚙️ Simulation Parameters (CFG block)
 
 - NUM_STORES, NUM_PRODUCTS, NUM_SUPPLIERS, NUM_ORDERS
@@ -120,117 +112,9 @@ https://raw.githubusercontent.com/your-username/repo-name/main/SupplyChain_Data/
 - Name your tables clearly (fact_orders, dim_products, etc.)
 - Define relationships in Model View
 
-### 🗂️ Manage Relationships
-
-| Table Name                                 | Relationship Type | Related Table                        |
-| ------------------------------------------ | ----------------- | ------------------------------------ |
-| `fact_inbound_shipments` (`SKU`)           | \* → 1            | `dim_products` (`SKU`)               |
-| `fact_inbound_shipments` (`Supplier_ID`)   | \* → 1            | `dim_suppliers` (`Supplier_ID`)      |
-| `fact_inventory_snapshot` (`Hub_ID`)       | \* → 1            | `dim_hubs` (`Hub_ID`)                |
-| `fact_inventory_snapshot` (`SKU`)          | \* → 1            | `dim_products` (`SKU`)               |
-| `fact_orders` (`SKU`)                      | \* → 1            | `dim_products` (`SKU`)               |
-| `fact_orders` (`Store_ID`)                 | \* → 1            | `dim_stores` (`Store_ID`)            |
-| `fact_returns` (`Order_Line_ID`)           | 1 ↔ 1             | `fact_orders` (`Order_Line_ID`)      |
-| `fact_shipments` (`Origin`)                | \* → 1            | `dim_hubs` (`Hub_ID`)                |
-| `link_shipment_orders` (`Order_Line_ID`)   | \* → 1            | `fact_orders` (`Order_Line_ID`)      |
-| `link_shipment_orders` (`Shipment_Leg_ID`) | \* → 1            | `fact_shipments` (`Shipment_Leg_ID`) |
-
----
-
-### 📐 DAX Measures
-
-#### 🚚 Order Fulfillment
-
-```
-Total Quantity Ordered = SUM('fact_orders'[Quantity_Ordered])
-Total Quantity Shipped = SUM('fact_orders'[Quantity_Shipped])
-Order Fulfillment Rate % = DIVIDE([Total Quantity Shipped], [Total Quantity Ordered], 0)
-```
-
-#### 🕒 Delivery Performance
-
-```
-Actual Delivery Date =
-MAXX(
-    FILTER(link_shipment_orders, RELATED(fact_shipments[Leg_Type]) = "Final-Mile"),
-    RELATED(fact_shipments[Arrival_Date])
-)
-
-Number of On Time Deliveries =
-COUNTROWS(
-    FILTER(
-        ADDCOLUMNS(fact_orders, "ActDate", [Actual Delivery Date]),
-        [ActDate] <= fact_orders[Required_Delivery_Date]
-    )
-)
-
-On Time Delivery % = DIVIDE([Number of On Time Deliveries], COUNTROWS(fact_orders), 0)
-```
-
-#### 🧮 Inventory Insights
-
-```
-Stockout Risk =
-COUNTROWS(
-    FILTER(
-        fact_inventory_snapshot,
-        fact_inventory_snapshot[Quantity_On_Hand] < RELATED(dim_products[ROP])
-    )
-)
-
-Average Product On Hand =
-AVERAGEX(
-    SUMMARIZE(fact_inventory_snapshot, fact_inventory_snapshot[SKU]),
-    CALCULATE(AVERAGE(fact_inventory_snapshot[Quantity_On_Hand]))
-)
-```
-
-#### 🚛 Transport Economics
-
-```
-Total Transport Cost = SUM(fact_shipments[Transportation_Cost])
-Cost Per Unit =
-DIVIDE(
-    [Total Transport Cost],
-    SUM(link_shipment_orders[Quantity_Shipped]),
-    0
-)
-```
-
-#### 🔁 Returns & Reverse Logistics
-
-```
-Total Returns = COUNTROWS(fact_returns)
-
-Return Rate % =
-DIVIDE(
-    SUM(fact_returns[Quantity_Returned]),
-    SUM(fact_orders[Quantity_Shipped]),
-    0
-) * 100
-```
-
-### Inbound Supplier Performance
-
-```
-OnTimeDeliveryRate =
-    DIVIDE(
-        COUNTROWS(
-            FILTER(
-                fact_inbound_shipments,
-                fact_inbound_shipments[Delay Days]=0
-            )
-        ),
-        COUNTROWS(fact_inbound_shipments)
-    )
-
-```
-
-```
-Avg Inbound Lead Time =
-AVERAGEX(fact_inbound_shipments, DATEDIFF(fact_inbound_shipments[Expected_Arrival_Date],
-fact_inbound_shipments[Actual_Arrival_Date],DAY))
-```
+### 📐 Define Relationships & DAX Measures
+- Use Model View to link tables
+- Create DAX measures for KPIs
 
 ### 📦 Project File Reference
 
