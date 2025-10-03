@@ -17,13 +17,13 @@ CFG = {
     "NUM_STORES":    100,  # Realistic for a regional chain
     "NUM_PRODUCTS":  500,  # Moderate SKU count for apparel retail
     "NUM_SUPPLIERS": 20,   # Few specialized suppliers
-    "NUM_ORDERS":    50000,  # Increased for realism (~40 orders/day over ~1277 days, suitable for 100 stores)
-    "START_DATE":    datetime(2022,1,1),
-    "END_DATE":      datetime(2025,6,30),
+    "NUM_ORDERS":    50000,  # ~40 orders/day over full window for ~100 stores
+    "START_DATE":    datetime(2022, 1, 1),
+    "END_DATE":      datetime(2025, 6, 30),
     "OUT_DIR":       Path("SupplyChain_Data"),
     "SEED":          42,
-    "SERVICE_FACTOR":1.65,  # ~95% service level, standard
-    "LT_MEAN":       7,     # Realistic domestic lead time in India
+    "SERVICE_FACTOR":1.65,  # ~95% service level
+    "LT_MEAN":       7,     # Domestic lead time (days)
     "LT_STD":        2,
 }
 
@@ -45,16 +45,16 @@ log = logging.getLogger()
 # 2. CONSTANTS & HELPERS
 # ----------------------------------------------------------------------------
 QUARTER_SEAS = {
-    1:{"Dress":.3,"Shoes":.4,"Accessories":.3},
-    2:{"Dress":.4,"Shoes":.3,"Accessories":.3},
-    3:{"Dress":.2,"Shoes":.3,"Accessories":.5},
-    4:{"Dress":.5,"Shoes":.2,"Accessories":.3},
+    1: {"Dress": .3, "Shoes": .4, "Accessories": .3},
+    2: {"Dress": .4, "Shoes": .3, "Accessories": .3},
+    3: {"Dress": .2, "Shoes": .3, "Accessories": .5},
+    4: {"Dress": .5, "Shoes": .2, "Accessories": .3},
 }
-MONTH_SEAS    = {1:0.9,2:0.9,3:1,4:1.1,5:1,6:.9,7:1.2,8:1.1,9:1,10:1.8,11:1.5,12:1.3}
-WEEKDAY_FACT = {i:(1.3 if i==6 else 1.2 if i==5 else 1.1 if i==4 else 1) for i in range(7)}
+MONTH_SEAS = {1:0.9,2:0.9,3:1.0,4:1.1,5:1.0,6:0.9,7:1.2,8:1.1,9:1.0,10:1.8,11:1.5,12:1.3}
+WEEKDAY_FACT = {i:(1.3 if i==6 else 1.2 if i==5 else 1.1 if i==4 else 1.0) for i in range(7)}
 
-SUP_SPEC       = {"Cotton Apparel":"Tiruppur","Leather Goods":"Kanpur","Jewellery":"Jaipur"}
-CAT_TO_SUP_SPEC= {"Dress":"Cotton Apparel","Shoes":"Leather Goods","Accessories":"Jewellery"}
+SUP_SPEC        = {"Cotton Apparel":"Tiruppur","Leather Goods":"Kanpur","Jewellery":"Jaipur"}
+CAT_TO_SUP_SPEC = {"Dress":"Cotton Apparel","Shoes":"Leather Goods","Accessories":"Jewellery"}
 
 RETURN_PROBS = {
     "Dress":       {"Wrong Size":0.6,"Wrong Colour":0.4},
@@ -62,7 +62,7 @@ RETURN_PROBS = {
     "Accessories": {"Wrong Size":0.5,"Wrong Colour":0.5}
 }
 
-# Realistic inter-hub distances (km) based on Indian geography
+# Inter-hub distances (km)
 HUB_DIST_MATRIX = {
     ("HUB-DEL", "HUB-BOM"): 1400,
     ("HUB-BOM", "HUB-DEL"): 1400,
@@ -70,31 +70,30 @@ HUB_DIST_MATRIX = {
     ("HUB-BLR", "HUB-DEL"): 2100,
     ("HUB-BOM", "HUB-BLR"): 1000,
     ("HUB-BLR", "HUB-BOM"): 1000,
-    # Same-hub: 0 (not used)
 }
 
-def sample_lead_time()->int:
+def sample_lead_time() -> int:
     lt = int(np.random.normal(CFG["LT_MEAN"], CFG["LT_STD"]))
     return max(3, min(14, lt))
 
-def courier_cost(dist_km:int, wt_kg:float, vol_cbm:float, is_inter_hub:bool=False)->float:
+def courier_cost(dist_km:int, wt_kg:float, vol_cbm:float, is_inter_hub:bool=False) -> float:
     """
-    Updated for realism: base ₹300 + ₹15/km + ₹8 per chargeable kg
+    Base ₹300 + ₹15/km + ₹8 per chargeable kg
     chargeable_kg = max(actual_kg, volumetric_kg)
-    volumetric_kg = vol_cbm * 200 (standard for Indian couriers)
+    volumetric_kg = vol_cbm * 200 (standard)
     For inter-hub (truck), multiply by 1.2 for bulk efficiency
     """
     vol_kg = vol_cbm * 200
     chg_kg = max(wt_kg, vol_kg)
     cost = 300 + 15*dist_km + 8*chg_kg
     if is_inter_hub:
-        cost *= 1.2  # Adjusted multiplier for truck costs
+        cost *= 1.2
     return round(cost, 2)
 
 # ----------------------------------------------------------------------------
 # 3. DIMENSIONS
 # ----------------------------------------------------------------------------
-def gen_hubs()->pd.DataFrame:
+def gen_hubs() -> pd.DataFrame:
     df = pd.DataFrame([
         {"Hub_ID":"HUB-DEL","Hub_Name":"Delhi Apparel Hub","Specialty":"Dress"},
         {"Hub_ID":"HUB-BOM","Hub_Name":"Mumbai Footwear Hub","Specialty":"Shoes"},
@@ -103,28 +102,28 @@ def gen_hubs()->pd.DataFrame:
     log.info("Hubs: %d", len(df))
     return df
 
-def gen_stores()->Tuple[pd.DataFrame,Dict[str,float]]:
+def gen_stores() -> Tuple[pd.DataFrame, Dict[str, float]]:
     """
-    Adds Store_Type=major/minor so we can pick distances realistically.
+    Adds Store_Type=major/minor for distance scaling.
     """
     placements = {
-        "HUB-DEL": (["Delhi","Gurgaon","Noida","Jaipur"],["Agra","Lucknow","Kanpur","Patna","Mathura"]),
-        "HUB-BOM": (["Pune","Surat","Ahmedabad","Thane"],["Nagpur","Bhopal","Raipur","Indore","Rajkot"]),
-        "HUB-BLR": (["Bengaluru","Chennai","Hyderabad"],["Coimbatore","Kochi","Tirupati"]),
+        "HUB-DEL": (["Delhi","Gurgaon","Noida","Jaipur"], ["Agra","Lucknow","Kanpur","Patna","Mathura"]),
+        "HUB-BOM": (["Pune","Surat","Ahmedabad","Thane"], ["Nagpur","Bhopal","Raipur","Indore","Rajkot"]),
+        "HUB-BLR": (["Bengaluru","Chennai","Hyderabad"],   ["Coimbatore","Kochi","Tirupati"]),
     }
     rows, mult = [], {}
-    sid=1
-    for hub,(maj, minr) in placements.items():
+    sid = 1
+    for hub, (maj, minr) in placements.items():
         for city in maj:
             for _ in range(3):
-                s=f"ST{sid:03d}"
+                s = f"ST{sid:03d}"
                 rows.append({"Store_ID":s,"Home_Hub_ID":hub,"City":city,"Store_Type":"major"})
-                mult[s]=random.uniform(1.5,2.5); sid+=1
+                mult[s] = random.uniform(1.5, 2.5); sid += 1
         for city in minr:
             for _ in range(2):
-                s=f"ST{sid:03d}"
+                s = f"ST{sid:03d}"
                 rows.append({"Store_ID":s,"Home_Hub_ID":hub,"City":city,"Store_Type":"minor"})
-                mult[s]=random.uniform(0.8,1.2); sid+=1
+                mult[s] = random.uniform(0.8, 1.2); sid += 1
 
     df = (pd.DataFrame(rows)
           .sample(frac=1, random_state=CFG["SEED"])
@@ -133,35 +132,35 @@ def gen_stores()->Tuple[pd.DataFrame,Dict[str,float]]:
     log.info("Stores: %d", len(df))
     return df, mult
 
-def gen_products()->pd.DataFrame:
+def gen_products() -> pd.DataFrame:
     specs = {
-        "Dress":        (["Cotton Kurta","Silk Anarkali","Linen Shirt Dress","Georgette Saree"],
-                         ["Aanya","Riya","Zoya","Elara"], (0.3,1.2), (0.002,0.008), (5,15)),
-        "Shoes":        (["Leather Loafers","Canvas Sneakers","Ethnic Juttis","Block Heels"],
-                         ["Vector","Orion","Nova","Apex"], (0.5,1.5), (0.005,0.015), (3,10)),
-        "Accessories":  (["Leather Handbag","Silver Jhumkas","Analog Watch","Canvas Belt"],
-                         ["Aura","Celeste","Eon","Luna"], (0.1,1.0), (0.001,0.020), (8,25)),
+        "Dress": (["Cotton Kurta","Silk Anarkali","Linen Shirt Dress","Georgette Saree"],
+                  ["Aanya","Riya","Zoya","Elara"], (0.3,1.2), (0.002,0.008), (5,15)),
+        "Shoes": (["Leather Loafers","Canvas Sneakers","Ethnic Juttis","Block Heels"],
+                  ["Vector","Orion","Nova","Apex"], (0.5,1.5), (0.005,0.015), (3,10)),
+        "Accessories": (["Leather Handbag","Silver Jhumkas","Analog Watch","Canvas Belt"],
+                        ["Aura","Celeste","Eon","Luna"], (0.1,1.0), (0.001,0.020), (8,25)),
     }
-    rows=[]
+    rows = []
     for i in range(1, CFG["NUM_PRODUCTS"]+1):
-        cat,(subs,names,w_rng,v_rng,d_rng)=random.choice(list(specs.items()))
-        sub=random.choice(subs)
-        name=f"{random.choice(names)} {sub}"
-        w=round(random.uniform(*w_rng),2)
-        v=round(random.uniform(*v_rng),4)
+        cat, (subs, names, w_rng, v_rng, d_rng) = random.choice(list(specs.items()))
+        sub  = random.choice(subs)
+        name = f"{random.choice(names)} {sub}"
+        w    = round(random.uniform(*w_rng), 2)
+        v    = round(random.uniform(*v_rng), 4)
         rows.append({
-            "SKU":f"SKU{i:04d}",
-            "Product_Name":name,
-            "Category":cat,
-            "Sub_Category":sub,
-            "Weight_kg":w,
-            "Volume_cbm":v,
-            "Base_Demand_Min":d_rng[0],
-            "Base_Demand_Max":d_rng[1],
+            "SKU": f"SKU{i:04d}",
+            "Product_Name": name,
+            "Category": cat,
+            "Sub_Category": sub,
+            "Weight_kg": w,
+            "Volume_cbm": v,
+            "Base_Demand_Min": d_rng[0],
+            "Base_Demand_Max": d_rng[1],
         })
-    df=pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
     # Pilot demand at 80% of base → faster depletion
-    df["Avg_Daily_Demand"] = ((df.Base_Demand_Min+df.Base_Demand_Max)/2)*0.80
+    df["Avg_Daily_Demand"] = ((df.Base_Demand_Min + df.Base_Demand_Max)/2)*0.80
     # ROP = μ*LT + z*μ*σ
     df["ROP"] = (
         df.Avg_Daily_Demand*CFG["LT_MEAN"]
@@ -172,18 +171,18 @@ def gen_products()->pd.DataFrame:
     log.info("Products: %d", len(df))
     return df
 
-def gen_suppliers()->Tuple[pd.DataFrame,pd.DataFrame]:
-    rows=[]
+def gen_suppliers() -> Tuple[pd.DataFrame, pd.DataFrame]:
+    rows = []
     for i in range(1, CFG["NUM_SUPPLIERS"]+1):
-        spec=random.choice(list(SUP_SPEC.keys()))
+        spec = random.choice(list(SUP_SPEC.keys()))
         rows.append({
             "Supplier_ID":       f"SUP{i:03d}",
             "City":              SUP_SPEC[spec],
             "Specialty":         spec,
-            "Reliability_Score": round(random.uniform(0.85,0.98),3)
+            "Reliability_Score": round(random.uniform(0.85, 0.98), 3)
         })
-    full=pd.DataFrame(rows)
-    slim=full.drop(columns=["Reliability_Score"])
+    full = pd.DataFrame(rows)
+    slim = full.drop(columns=["Reliability_Score"])
     log.info("Suppliers: %d", len(slim))
     return slim, full
 
@@ -191,25 +190,48 @@ def gen_suppliers()->Tuple[pd.DataFrame,pd.DataFrame]:
 # 4. INITIAL INVENTORY
 # ----------------------------------------------------------------------------
 def seed_inventory(hubs: pd.DataFrame, prods: pd.DataFrame) -> Dict[Tuple[str, str], int]:
-    m = hubs.set_index("Specialty")["Hub_ID"].to_dict()
-    # Precompute SKU -> Target_Level for O(1) lookups instead of per-iteration .loc
-    target_map = prods.set_index("SKU")["Target_Level"].to_dict()
-    inv = {}
+    spec_to_hub = hubs.set_index("Specialty")["Hub_ID"].to_dict()
+    target_map  = prods.set_index("SKU")["Target_Level"].to_dict()
+    inv: Dict[Tuple[str, str], int] = {}
     for _, r in prods.iterrows():
         tgt = target_map[r.SKU]
-        inv[(m[r.Category], r.SKU)] = int(tgt * random.uniform(0.9, 1.1))
+        inv[(spec_to_hub[r.Category], r.SKU)] = int(tgt * random.uniform(0.9, 1.1))
     log.info("Seeded inventory: %d hub-SKU pairs", len(inv))
     return inv
 
+# ----------------------------------------------------------------------------
+# 5. RETURNS HANDLER
+# ----------------------------------------------------------------------------
+def handle_returns(order_lines: List[Dict], arrival_date: date, sku_to_cat: Dict[str, str],
+                   next_rt: int, rets: List[Dict]) -> int:
+    for ol in order_lines:
+        return_rate = random.uniform(0.03, 0.06)
+        if random.random() < return_rate:
+            ret_q = random.randint(1, ol["Quantity_Shipped"])
+            cat   = sku_to_cat[ol["SKU"]]
+            reason = random.choices(
+                list(RETURN_PROBS[cat].keys()),
+                weights=list(RETURN_PROBS[cat].values())
+            )[0]
+            rets.append({
+                "Return_ID": f"RET{next_rt:05d}",
+                "Order_Line_ID": ol["Order_Line_ID"],
+                "SKU": ol["SKU"],
+                "Quantity_Returned": ret_q,
+                "Return_Date": arrival_date + timedelta(days=random.randint(1, 21)),
+                "Return_Reason": reason
+            })
+            next_rt += 1
+    return next_rt
 
 # ----------------------------------------------------------------------------
-# 5. DAILY PIPELINE
+# 6. DAILY PIPELINE
 # ----------------------------------------------------------------------------
 def main():
-    hubs      = gen_hubs()
-    stores, mult_map = gen_stores()
-    prods     = gen_products()
-    sup_dim, sup_full= gen_suppliers()
+    hubs                = gen_hubs()
+    stores, mult_map    = gen_stores()
+    prods               = gen_products()
+    sup_dim, sup_full   = gen_suppliers()
 
     # Lookups
     hub_map    = hubs.set_index("Specialty")["Hub_ID"].to_dict()
@@ -219,16 +241,34 @@ def main():
     sku_to_wt  = prods.set_index("SKU")["Weight_kg"].to_dict()
     sku_to_vol = prods.set_index("SKU")["Volume_cbm"].to_dict()
 
-    inv_levels  = seed_inventory(hubs, prods)
-    pending_inb = []
-    pending_crossdock = {}  # hub_id -> list of {"Order_ID": str, "SKU": str, "Quantity": int, "Arrival_Date": date, "From_Hub": str}
+    inv_levels       = seed_inventory(hubs, prods)
+    pending_inb: List[Dict] = []
+    pending_crossdock: Dict[str, List[Dict]] = {}  # hub_id -> items
     next_ord, next_ol, next_leg, next_inb, next_rt = 1, 1, 1, 1, 1
 
-    orders, legs, links, inbs, rets, snaps = ([] for _ in range(6))
+    orders: List[Dict] = []
+    legs:   List[Dict] = []
+    links:  List[Dict] = []
+    inbs:   List[Dict] = []
+    rets:   List[Dict] = []
+    snaps:  List[Dict] = []
+
     total_days = (CFG["END_DATE"] - CFG["START_DATE"]).days + 1
     avg_daily  = CFG["NUM_ORDERS"] / total_days
-    calendar   = pd.date_range(CFG["START_DATE"], CFG["END_DATE"], freq="D")
 
+    # --- NEW: Random YOY growth and compounded multipliers ---
+    years = range(CFG["START_DATE"].year, CFG["END_DATE"].year + 1)
+    year_growth = {year: random.uniform(-0.10, 0.15) for year in years}  # -10% to +15%
+    log.info("Yearly growth rates (YOY): %s", year_growth)
+
+    cum_multiplier: Dict[int, float] = {}
+    running = 1.0
+    for y in years:
+        running *= (1.0 + year_growth[y])
+        cum_multiplier[y] = running
+    # ---------------------------------------------------------
+
+    calendar = pd.date_range(CFG["START_DATE"], CFG["END_DATE"], freq="D")
     for ts in calendar:
         today = ts.date()
 
@@ -236,27 +276,31 @@ def main():
         for ev in pending_inb[:]:
             if ev["Actual_Arrival_Date"] == today:
                 inv_levels[(ev["Destination_Hub_ID"], ev["SKU"])] += ev["Quantity_Received"]
-                inbs.append({**ev, "Actual_Arrival_Date":today})
+                inbs.append({**ev, "Actual_Arrival_Date": today})
                 pending_inb.remove(ev)
 
         # 2) Generate daily orders as grouped multi-line orders
-        nords = np.random.poisson(avg_daily)
+        adjusted_avg_daily = avg_daily * cum_multiplier[today.year]
+        nords = np.random.poisson(adjusted_avg_daily)
+
         daily_orders = []
         for _ in range(nords):
             store_row = stores.sample(1).iloc[0]
-            home_hub = store_row["Home_Hub_ID"]
+            home_hub  = store_row["Home_Hub_ID"]
             num_lines = random.randint(1, 5)  # Multi-SKU orders
-            order_id = f"ORD{next_ord:05d}"
+            order_id  = f"ORD{next_ord:05d}"
             next_ord += 1
             order_lines = []
             for __ in range(num_lines):
                 prod = prods.sample(1).iloc[0]
                 base = random.randint(prod.Base_Demand_Min, prod.Base_Demand_Max)
-                qtyf = (base * mult_map[store_row.Store_ID]
-                        * QUARTER_SEAS[(today.month-1)//3+1][prod.Category]
-                        * MONTH_SEAS[today.month]
-                        * WEEKDAY_FACT[today.weekday()]
-                        * random.uniform(0.9,1.1))
+                qtyf = (
+                    base * mult_map[store_row.Store_ID]
+                    * QUARTER_SEAS[(today.month-1)//3 + 1][prod.Category]
+                    * MONTH_SEAS[today.month]
+                    * WEEKDAY_FACT[today.weekday()]
+                    * random.uniform(0.9, 1.1)
+                )
                 q = max(1, int(round(qtyf)))
                 ol = {
                     "Order_Line_ID": f"OL{next_ol:05d}",
@@ -277,15 +321,15 @@ def main():
                 "Lines": order_lines
             })
 
-        # 3) Process each order: Handle picking, inter-hub shipments, and queue to cross-dock
+        # 3) Process each order: picking, inter-hub shipments, cross-dock queue
         for order in daily_orders:
             home_hub = order["Home_Hub_ID"]
             source_hubs = set(ol["Source_Hub_ID"] for ol in order["Lines"])
             is_direct = len(source_hubs) == 1 and home_hub in source_hubs
 
-            crossdock_items = {}  # For local picks
+            crossdock_items: Dict[str, int] = {}  # SKU -> qty for local picks
             inter_legs_created = False
-            shipped_lines = []  # Collect only lines that are actually shipped
+            shipped_lines: List[Dict] = []
 
             for ol in order["Lines"]:
                 src_hub = ol["Source_Hub_ID"]
@@ -296,11 +340,11 @@ def main():
                     continue
                 ol["Quantity_Shipped"] = ship
                 orders.append(ol)
-                inv_levels[key] -= ship  # Deduct inventory immediately on pick/dispatch
+                inv_levels[key] -= ship
                 shipped_lines.append(ol)
 
                 if src_hub == home_hub:
-                    # Local pick: directly to cross-dock
+                    # Local pick
                     crossdock_items[ol["SKU"]] = crossdock_items.get(ol["SKU"], 0) + ship
                 else:
                     # Inter-hub shipment to home_hub cross-dock
@@ -308,12 +352,12 @@ def main():
                     lid = f"SL{next_leg:06d}"
                     next_leg += 1
                     dist_key = (src_hub, home_hub)
-                    dist = HUB_DIST_MATRIX.get(dist_key, random.randint(200, 1000))  # Use matrix if available, else random
-                    wt = ship * sku_to_wt[ol["SKU"]]
+                    dist = HUB_DIST_MATRIX.get(dist_key, random.randint(200, 1000))
+                    wt  = ship * sku_to_wt[ol["SKU"]]
                     vol = ship * sku_to_vol[ol["SKU"]]
                     cost = courier_cost(dist, wt, vol, is_inter_hub=True)
                     dispatch_date = today
-                    arrival_date = today + timedelta(days=random.randint(1, 3))  # Short lead for inter-hub
+                    arrival_date  = today + timedelta(days=random.randint(1, 3))
                     leg = {
                         "Shipment_Leg_ID": lid,
                         "Leg_Type": "Inter-Hub",
@@ -330,7 +374,6 @@ def main():
                         "Order_Line_ID": ol["Order_Line_ID"],
                         "Quantity_Shipped": ship
                     })
-                    # Queue to pending_crossdock
                     pending_crossdock.setdefault(home_hub, []).append({
                         "Order_ID": order["Order_ID"],
                         "SKU": ol["SKU"],
@@ -339,14 +382,14 @@ def main():
                         "From_Hub": src_hub
                     })
 
-            # If direct shipment (only home hub items), ship directly without cross-dock queue
+            # Direct final-mile if everything from home hub
             if is_direct and crossdock_items:
                 lid = f"SL{next_leg:06d}"
                 next_leg += 1
-                wt = sum(qty * sku_to_wt[sku] for sku, qty in crossdock_items.items())
+                wt  = sum(qty * sku_to_wt[sku] for sku, qty in crossdock_items.items())
                 vol = sum(qty * sku_to_vol[sku] for sku, qty in crossdock_items.items())
                 st_type = stores.set_index("Store_ID").loc[order["Store_ID"], "Store_Type"]
-                dist = random.randint(20,50) if st_type=="major" else random.randint(50,120)
+                dist = random.randint(20,50) if st_type == "major" else random.randint(50,120)
                 cost = courier_cost(dist, wt, vol)
                 arrival_date = today + timedelta(days=1)
                 leg = {
@@ -366,42 +409,39 @@ def main():
                         "Order_Line_ID": ol["Order_Line_ID"],
                         "Quantity_Shipped": ol["Quantity_Shipped"]
                     })
-                # Handle returns for direct shipments
                 next_rt = handle_returns(shipped_lines, arrival_date, sku_to_cat, next_rt, rets)
 
-            # For non-direct, local items are immediately "arrived" at cross-dock
+            # For mixed-source orders, local items are available immediately at cross-dock
             if crossdock_items and inter_legs_created:
                 for sku, qty in crossdock_items.items():
                     pending_crossdock.setdefault(home_hub, []).append({
                         "Order_ID": order["Order_ID"],
                         "SKU": sku,
                         "Quantity": qty,
-                        "Arrival_Date": today,  # Immediate for local
+                        "Arrival_Date": today,  # immediate
                         "From_Hub": home_hub
                     })
 
-        # 4) Process cross-dock arrivals and consolidations (only when all parts arrived)
+        # 4) Cross-dock consolidation when all parts have arrived
         if pending_crossdock:
             for hub in list(pending_crossdock.keys()):
-                order_ids = set(item['Order_ID'] for item in pending_crossdock[hub])
+                order_ids = set(item["Order_ID"] for item in pending_crossdock[hub])
                 for ord_id in list(order_ids):
-                    all_for_order = [item for item in pending_crossdock[hub] if item['Order_ID'] == ord_id]
-                    arrived_for_order = [item for item in all_for_order if item['Arrival_Date'] <= today]
+                    all_for_order = [item for item in pending_crossdock[hub] if item["Order_ID"] == ord_id]
+                    arrived_for_order = [item for item in all_for_order if item["Arrival_Date"] <= today]
                     if len(arrived_for_order) == len(all_for_order) and len(arrived_for_order) > 0:
-                        # All parts arrived; consolidate
-                        order_items = defaultdict(int)
+                        # Consolidate and ship final-mile
+                        order_items: Dict[str, int] = defaultdict(int)
                         for item in arrived_for_order:
-                            order_items[item['SKU']] += item['Quantity']
-
-                        # Get store_id from orders
+                            order_items[item["SKU"]] += item["Quantity"]
+                        # Pick store_id from any shipped line of the order
                         store_id = next(ol["Store_ID"] for ol in orders if ol["Order_ID"] == ord_id)
-                        # Create final-mile leg
                         lid = f"SL{next_leg:06d}"
                         next_leg += 1
-                        wt = sum(qty * sku_to_wt[sku] for sku, qty in order_items.items())
+                        wt  = sum(qty * sku_to_wt[sku] for sku, qty in order_items.items())
                         vol = sum(qty * sku_to_vol[sku] for sku, qty in order_items.items())
                         st_type = stores.set_index("Store_ID").loc[store_id, "Store_Type"]
-                        dist = random.randint(20,50) if st_type=="major" else random.randint(50,120)
+                        dist = random.randint(20,50) if st_type == "major" else random.randint(50,120)
                         cost = courier_cost(dist, wt, vol)
                         arrival_date = today + timedelta(days=1)
                         leg = {
@@ -415,7 +455,6 @@ def main():
                             "Transportation_Cost": cost
                         }
                         legs.append(leg)
-                        # Link to order lines
                         order_lines = [ol for ol in orders if ol["Order_ID"] == ord_id]
                         for ol in order_lines:
                             links.append({
@@ -423,26 +462,25 @@ def main():
                                 "Order_Line_ID": ol["Order_Line_ID"],
                                 "Quantity_Shipped": ol["Quantity_Shipped"]
                             })
-                        # Handle returns
                         next_rt = handle_returns(order_lines, arrival_date, sku_to_cat, next_rt, rets)
-
                         # Remove processed items
-                        pending_crossdock[hub] = [item for item in pending_crossdock[hub] if item['Order_ID'] != ord_id]
-
-                # Clean up empty lists
+                        pending_crossdock[hub] = [item for item in pending_crossdock[hub] if item["Order_ID"] != ord_id]
                 if not pending_crossdock[hub]:
                     del pending_crossdock[hub]
 
-        # 5) Reorder per hub in one container
+        # 5) Replenishment: one inbound container per hub when any SKU under ROP
         for hub in hubs.Hub_ID:
-            lows = [sku for (h,sku),qty in inv_levels.items() if h==hub and qty<sku_to_rop[sku]]
-            if not lows: continue
-            if any(ev["Destination_Hub_ID"]==hub for ev in pending_inb): continue
+            lows = [sku for (h,sku), qty in inv_levels.items() if h == hub and qty < sku_to_rop[sku]]
+            if not lows:
+                continue
+            # Skip if an inbound already en route to hub
+            if any(ev["Destination_Hub_ID"] == hub for ev in pending_inb):
+                continue
             spec = CAT_TO_SUP_SPEC[sku_to_cat[lows[0]]]
-            sup  = sup_full[sup_full.Specialty==spec].sample(1).iloc[0]
-            cid  = f"INB{next_inb:05d}"; next_inb+=1
+            sup  = sup_full[sup_full.Specialty == spec].sample(1).iloc[0]
+            cid  = f"INB{next_inb:05d}"; next_inb += 1
             for sku in lows:
-                need = max(1, sku_to_tgt[sku]-inv_levels[(hub,sku)])
+                need = max(1, sku_to_tgt[sku] - inv_levels[(hub, sku)])
                 lt   = sample_lead_time()
                 ev = {
                     "Inbound_Shipment_ID":  cid,
@@ -450,13 +488,13 @@ def main():
                     "Destination_Hub_ID":   hub,
                     "SKU":                  sku,
                     "Quantity_Received":    need,
-                    "Expected_Arrival_Date":today + timedelta(days=lt - random.randint(0, 5)),
-                    "Actual_Arrival_Date":  today + timedelta(days=lt)
+                    "Expected_Arrival_Date": today + timedelta(days=lt - random.randint(0, 5)),
+                    "Actual_Arrival_Date":   today + timedelta(days=lt)
                 }
                 pending_inb.append(ev)
 
-        # 6) Daily snapshot
-        for (hub,sku),qty in inv_levels.items():
+        # 6) Daily inventory snapshot
+        for (hub, sku), qty in inv_levels.items():
             snaps.append({
                 "Snapshot_Date":    today,
                 "Hub_ID":           hub,
@@ -464,7 +502,7 @@ def main():
                 "Quantity_On_Hand": qty
             })
 
-    # 7) Save
+    # 7) Save all outputs
     tables = [
         (hubs,   "dim_hubs.csv"),
         (stores, "dim_stores.csv"),
@@ -477,29 +515,11 @@ def main():
         (pd.DataFrame(snaps),  "fact_inventory_snapshot.csv"),
         (pd.DataFrame(rets),   "fact_returns.csv"),
     ]
-    for df,name in tables:
+    for df, name in tables:
         df.to_csv(CFG["OUT_DIR"]/name, index=False)
         log.info("Saved %s (%d rows)", name, len(df))
 
     log.info("Generation complete.")
 
-def handle_returns(order_lines: List[Dict], arrival_date: date, sku_to_cat: Dict[str, str], next_rt: int, rets: List[Dict]) -> int:
-    for ol in order_lines:
-        return_rate = random.uniform(0.03, 0.06)
-        if random.random() < return_rate:
-            ret_q = random.randint(1, ol["Quantity_Shipped"])
-            cat = sku_to_cat[ol["SKU"]]
-            reason = random.choices(list(RETURN_PROBS[cat].keys()), weights=list(RETURN_PROBS[cat].values()))[0]
-            rets.append({
-                "Return_ID": f"RET{next_rt:05d}",
-                "Order_Line_ID": ol["Order_Line_ID"],
-                "SKU": ol["SKU"],
-                "Quantity_Returned": ret_q,
-                "Return_Date": arrival_date + timedelta(days=random.randint(1,21)),
-                "Return_Reason": reason
-            })
-            next_rt += 1
-    return next_rt
-
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
