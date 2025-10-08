@@ -134,12 +134,18 @@ def gen_stores() -> Tuple[pd.DataFrame, Dict[str, float]]:
 
 def gen_products() -> pd.DataFrame:
     specs = {
-        "Dress": (["Cotton Kurta","Silk Anarkali","Linen Shirt Dress","Georgette Saree"],
-                  ["Aanya","Riya","Zoya","Elara"], (0.3,1.2), (0.002,0.008), (5,15)),
-        "Shoes": (["Leather Loafers","Canvas Sneakers","Ethnic Juttis","Block Heels"],
-                  ["Vector","Orion","Nova","Apex"], (0.5,1.5), (0.005,0.015), (3,10)),
-        "Accessories": (["Leather Handbag","Silver Jhumkas","Analog Watch","Canvas Belt"],
-                        ["Aura","Celeste","Eon","Luna"], (0.1,1.0), (0.001,0.020), (8,25)),
+        "Dress": (
+            ["Cotton Kurta","Silk Anarkali","Linen Shirt Dress","Georgette Saree"],
+            ["Aanya","Riya","Zoya","Elara"], (0.3,1.2), (0.002,0.008), (5,15)
+        ),
+        "Shoes": (
+            ["Leather Loafers","Canvas Sneakers","Ethnic Juttis","Block Heels"],
+            ["Vector","Orion","Nova","Apex"], (0.5,1.5), (0.005,0.015), (3,10)
+        ),
+        "Accessories": (
+            ["Leather Handbag","Silver Jhumkas","Analog Watch","Canvas Belt"],
+            ["Aura","Celeste","Eon","Luna"], (0.1,1.0), (0.001,0.020), (8,25)
+        ),
     }
     rows = []
     for i in range(1, CFG["NUM_PRODUCTS"]+1):
@@ -200,27 +206,43 @@ def seed_inventory(hubs: pd.DataFrame, prods: pd.DataFrame) -> Dict[Tuple[str, s
     return inv
 
 # ----------------------------------------------------------------------------
-# 5. RETURNS HANDLER
+# 5. RETURNS HANDLER (updated to restock into inv_levels)
 # ----------------------------------------------------------------------------
-def handle_returns(order_lines: List[Dict], arrival_date: date, sku_to_cat: Dict[str, str],
-                   next_rt: int, rets: List[Dict]) -> int:
+def handle_returns(
+    order_lines: List[Dict],
+    arrival_date: date,
+    sku_to_cat: Dict[str, str],
+    next_rt: int,
+    rets: List[Dict],
+    inv_levels: Dict[Tuple[str, str], int],   # NEW: inventory map
+) -> int:
     for ol in order_lines:
+        # Skip lines with no shipment qty recorded
+        shipped_qty = ol.get("Quantity_Shipped", 0)
+        if shipped_qty <= 0:
+            continue
+        # Random return decision and quantity
         return_rate = random.uniform(0.03, 0.06)
         if random.random() < return_rate:
-            ret_q = random.randint(1, ol["Quantity_Shipped"])
+            ret_q = random.randint(1, shipped_qty)
             cat   = sku_to_cat[ol["SKU"]]
             reason = random.choices(
                 list(RETURN_PROBS[cat].keys()),
                 weights=list(RETURN_PROBS[cat].values())
             )[0]
+            ret_date = arrival_date + timedelta(days=random.randint(1, 21))
             rets.append({
-                "Return_ID": f"RET{next_rt:05d}",
-                "Order_Line_ID": ol["Order_Line_ID"],
-                "SKU": ol["SKU"],
+                "Return_ID":         f"RET{next_rt:05d}",
+                "Order_Line_ID":     ol["Order_Line_ID"],
+                "SKU":               ol["SKU"],
                 "Quantity_Returned": ret_q,
-                "Return_Date": arrival_date + timedelta(days=random.randint(1, 21)),
-                "Return_Reason": reason
+                "Return_Date":       ret_date,
+                "Return_Reason":     reason
             })
+            # Add returned units back to the source hub’s inventory immediately
+            src_hub = ol["Source_Hub_ID"]
+            key = (src_hub, ol["SKU"])
+            inv_levels[key] = inv_levels.get(key, 0) + ret_q
             next_rt += 1
     return next_rt
 
@@ -256,7 +278,7 @@ def main():
     total_days = (CFG["END_DATE"] - CFG["START_DATE"]).days + 1
     avg_daily  = CFG["NUM_ORDERS"] / total_days
 
-    # --- NEW: Random YOY growth and compounded multipliers ---
+    # --- Random YOY growth and compounded multipliers ---
     years = range(CFG["START_DATE"].year, CFG["END_DATE"].year + 1)
     year_growth = {year: random.uniform(-0.10, 0.15) for year in years}  # -10% to +15%
     log.info("Yearly growth rates (YOY): %s", year_growth)
@@ -275,14 +297,13 @@ def main():
         # 1) Inbound arrivals
         for ev in pending_inb[:]:
             if ev["Actual_Arrival_Date"] == today:
-                inv_levels[(ev["Destination_Hub_ID"], ev["SKU"])] += ev["Quantity_Received"]
+                inv_levels[(ev["Destination_Hub_ID"], ev["SKU"])] = inv_levels.get((ev["Destination_Hub_ID"], ev["SKU"]), 0) + ev["Quantity_Received"]
                 inbs.append({**ev, "Actual_Arrival_Date": today})
                 pending_inb.remove(ev)
 
         # 2) Generate daily orders as grouped multi-line orders
         adjusted_avg_daily = avg_daily * cum_multiplier[today.year]
         nords = np.random.poisson(adjusted_avg_daily)
-
         daily_orders = []
         for _ in range(nords):
             store_row = stores.sample(1).iloc[0]
@@ -409,7 +430,8 @@ def main():
                         "Order_Line_ID": ol["Order_Line_ID"],
                         "Quantity_Shipped": ol["Quantity_Shipped"]
                     })
-                next_rt = handle_returns(shipped_lines, arrival_date, sku_to_cat, next_rt, rets)
+                # UPDATED: pass inv_levels so returns restock at source hub
+                next_rt = handle_returns(shipped_lines, arrival_date, sku_to_cat, next_rt, rets, inv_levels)
 
             # For mixed-source orders, local items are available immediately at cross-dock
             if crossdock_items and inter_legs_created:
@@ -462,10 +484,11 @@ def main():
                                 "Order_Line_ID": ol["Order_Line_ID"],
                                 "Quantity_Shipped": ol["Quantity_Shipped"]
                             })
-                        next_rt = handle_returns(order_lines, arrival_date, sku_to_cat, next_rt, rets)
+                        # UPDATED: pass inv_levels so returns restock at source hub
+                        next_rt = handle_returns(order_lines, arrival_date, sku_to_cat, next_rt, rets, inv_levels)
                         # Remove processed items
                         pending_crossdock[hub] = [item for item in pending_crossdock[hub] if item["Order_ID"] != ord_id]
-                if not pending_crossdock[hub]:
+                if hub in pending_crossdock and not pending_crossdock[hub]:
                     del pending_crossdock[hub]
 
         # 5) Replenishment: one inbound container per hub when any SKU under ROP
