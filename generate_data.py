@@ -165,14 +165,11 @@ def gen_products() -> pd.DataFrame:
             "Base_Demand_Max": d_rng[1],
         })
     df = pd.DataFrame(rows)
-    # Pilot demand at 80% of base → faster depletion
     df["Avg_Daily_Demand"] = ((df.Base_Demand_Min + df.Base_Demand_Max)/2)*0.80
-    # ROP = μ*LT + z*μ*σ
     df["ROP"] = (
         df.Avg_Daily_Demand*CFG["LT_MEAN"]
         + CFG["SERVICE_FACTOR"]*df.Avg_Daily_Demand*CFG["LT_STD"]
     ).round().astype(int)
-    # Target = ROP + 7-day demand
     df["Target_Level"] = (df.ROP + 7*df.Avg_Daily_Demand).round().astype(int)
     log.info("Products: %d", len(df))
     return df
@@ -217,11 +214,9 @@ def handle_returns(
     inv_levels: Dict[Tuple[str, str], int],   # NEW: inventory map
 ) -> int:
     for ol in order_lines:
-        # Skip lines with no shipment qty recorded
         shipped_qty = ol.get("Quantity_Shipped", 0)
         if shipped_qty <= 0:
             continue
-        # Random return decision and quantity
         return_rate = random.uniform(0.03, 0.06)
         if random.random() < return_rate:
             ret_q = random.randint(1, shipped_qty)
@@ -239,7 +234,7 @@ def handle_returns(
                 "Return_Date":       ret_date,
                 "Return_Reason":     reason
             })
-            # Add returned units back to the source hub’s inventory immediately
+            # Restock at source hub immediately upon return creation
             src_hub = ol["Source_Hub_ID"]
             key = (src_hub, ol["SKU"])
             inv_levels[key] = inv_levels.get(key, 0) + ret_q
@@ -278,7 +273,6 @@ def main():
     total_days = (CFG["END_DATE"] - CFG["START_DATE"]).days + 1
     avg_daily  = CFG["NUM_ORDERS"] / total_days
 
-    # --- Random YOY growth and compounded multipliers ---
     years = range(CFG["START_DATE"].year, CFG["END_DATE"].year + 1)
     year_growth = {year: random.uniform(-0.10, 0.15) for year in years}  # -10% to +15%
     log.info("Yearly growth rates (YOY): %s", year_growth)
@@ -288,7 +282,6 @@ def main():
     for y in years:
         running *= (1.0 + year_growth[y])
         cum_multiplier[y] = running
-    # ---------------------------------------------------------
 
     calendar = pd.date_range(CFG["START_DATE"], CFG["END_DATE"], freq="D")
     for ts in calendar:
@@ -297,7 +290,8 @@ def main():
         # 1) Inbound arrivals
         for ev in pending_inb[:]:
             if ev["Actual_Arrival_Date"] == today:
-                inv_levels[(ev["Destination_Hub_ID"], ev["SKU"])] = inv_levels.get((ev["Destination_Hub_ID"], ev["SKU"]), 0) + ev["Quantity_Received"]
+                key = (ev["Destination_Hub_ID"], ev["SKU"])
+                inv_levels[key] = inv_levels.get(key, 0) + ev["Quantity_Received"]
                 inbs.append({**ev, "Actual_Arrival_Date": today})
                 pending_inb.remove(ev)
 
@@ -308,7 +302,7 @@ def main():
         for _ in range(nords):
             store_row = stores.sample(1).iloc[0]
             home_hub  = store_row["Home_Hub_ID"]
-            num_lines = random.randint(1, 5)  # Multi-SKU orders
+            num_lines = random.randint(1, 5)
             order_id  = f"ORD{next_ord:05d}"
             next_ord += 1
             order_lines = []
@@ -348,7 +342,7 @@ def main():
             source_hubs = set(ol["Source_Hub_ID"] for ol in order["Lines"])
             is_direct = len(source_hubs) == 1 and home_hub in source_hubs
 
-            crossdock_items: Dict[str, int] = {}  # SKU -> qty for local picks
+            crossdock_items: Dict[str, int] = {}
             inter_legs_created = False
             shipped_lines: List[Dict] = []
 
@@ -365,10 +359,8 @@ def main():
                 shipped_lines.append(ol)
 
                 if src_hub == home_hub:
-                    # Local pick
                     crossdock_items[ol["SKU"]] = crossdock_items.get(ol["SKU"], 0) + ship
                 else:
-                    # Inter-hub shipment to home_hub cross-dock
                     inter_legs_created = True
                     lid = f"SL{next_leg:06d}"
                     next_leg += 1
@@ -452,11 +444,9 @@ def main():
                     all_for_order = [item for item in pending_crossdock[hub] if item["Order_ID"] == ord_id]
                     arrived_for_order = [item for item in all_for_order if item["Arrival_Date"] <= today]
                     if len(arrived_for_order) == len(all_for_order) and len(arrived_for_order) > 0:
-                        # Consolidate and ship final-mile
                         order_items: Dict[str, int] = defaultdict(int)
                         for item in arrived_for_order:
                             order_items[item["SKU"]] += item["Quantity"]
-                        # Pick store_id from any shipped line of the order
                         store_id = next(ol["Store_ID"] for ol in orders if ol["Order_ID"] == ord_id)
                         lid = f"SL{next_leg:06d}"
                         next_leg += 1
@@ -486,7 +476,6 @@ def main():
                             })
                         # UPDATED: pass inv_levels so returns restock at source hub
                         next_rt = handle_returns(order_lines, arrival_date, sku_to_cat, next_rt, rets, inv_levels)
-                        # Remove processed items
                         pending_crossdock[hub] = [item for item in pending_crossdock[hub] if item["Order_ID"] != ord_id]
                 if hub in pending_crossdock and not pending_crossdock[hub]:
                     del pending_crossdock[hub]
@@ -496,7 +485,6 @@ def main():
             lows = [sku for (h,sku), qty in inv_levels.items() if h == hub and qty < sku_to_rop[sku]]
             if not lows:
                 continue
-            # Skip if an inbound already en route to hub
             if any(ev["Destination_Hub_ID"] == hub for ev in pending_inb):
                 continue
             spec = CAT_TO_SUP_SPEC[sku_to_cat[lows[0]]]
