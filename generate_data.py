@@ -203,7 +203,7 @@ def seed_inventory(hubs: pd.DataFrame, prods: pd.DataFrame) -> Dict[Tuple[str, s
     return inv
 
 # ----------------------------------------------------------------------------
-# 5. RETURNS HANDLER (updated to restock into inv_levels)
+# 5. RETURNS HANDLER (deferred restock on Return_Date)
 # ----------------------------------------------------------------------------
 def handle_returns(
     order_lines: List[Dict],
@@ -211,8 +211,13 @@ def handle_returns(
     sku_to_cat: Dict[str, str],
     next_rt: int,
     rets: List[Dict],
-    inv_levels: Dict[Tuple[str, str], int],   # NEW: inventory map
+    inv_levels: Dict[Tuple[str, str], int],
+    pending_returns: List[Dict]
 ) -> int:
+    """
+    Create returns with a Return_Date in the future and enqueue them.
+    Inventory restock occurs when today == Return_Date in the main loop.
+    """
     for ol in order_lines:
         shipped_qty = ol.get("Quantity_Shipped", 0)
         if shipped_qty <= 0:
@@ -234,10 +239,13 @@ def handle_returns(
                 "Return_Date":       ret_date,
                 "Return_Reason":     reason
             })
-            # Restock at source hub immediately upon return creation
-            src_hub = ol["Source_Hub_ID"]
-            key = (src_hub, ol["SKU"])
-            inv_levels[key] = inv_levels.get(key, 0) + ret_q
+            # Defer restock to Return_Date
+            pending_returns.append({
+                "Return_Date":  ret_date,
+                "Hub_ID":       ol["Source_Hub_ID"],
+                "SKU":          ol["SKU"],
+                "Quantity":     ret_q
+            })
             next_rt += 1
     return next_rt
 
@@ -261,6 +269,7 @@ def main():
     inv_levels       = seed_inventory(hubs, prods)
     pending_inb: List[Dict] = []
     pending_crossdock: Dict[str, List[Dict]] = {}  # hub_id -> items
+    pending_returns: List[Dict] = []               # NEW: deferred returns
     next_ord, next_ol, next_leg, next_inb, next_rt = 1, 1, 1, 1, 1
 
     orders: List[Dict] = []
@@ -274,7 +283,7 @@ def main():
     avg_daily  = CFG["NUM_ORDERS"] / total_days
 
     years = range(CFG["START_DATE"].year, CFG["END_DATE"].year + 1)
-    year_growth = {year: random.uniform(-0.10, 0.15) for year in years}  # -10% to +15%
+    year_growth = {year: random.uniform(-0.05, 0.15) for year in years}  # -10% to +15%
     log.info("Yearly growth rates (YOY): %s", year_growth)
 
     cum_multiplier: Dict[int, float] = {}
@@ -287,11 +296,17 @@ def main():
     for ts in calendar:
         today = ts.date()
 
+        # 0) Apply any returns due today before other movements (ensures snapshot alignment)
+        for pr in pending_returns[:]:
+            if pr["Return_Date"] == today:
+                key = (pr["Hub_ID"], pr["SKU"])
+                inv_levels[key] = inv_levels.get(key, 0) + pr["Quantity"]
+                pending_returns.remove(pr)
+
         # 1) Inbound arrivals
         for ev in pending_inb[:]:
             if ev["Actual_Arrival_Date"] == today:
-                key = (ev["Destination_Hub_ID"], ev["SKU"])
-                inv_levels[key] = inv_levels.get(key, 0) + ev["Quantity_Received"]
+                inv_levels[(ev["Destination_Hub_ID"], ev["SKU"])] = inv_levels.get((ev["Destination_Hub_ID"], ev["SKU"]), 0) + ev["Quantity_Received"]
                 inbs.append({**ev, "Actual_Arrival_Date": today})
                 pending_inb.remove(ev)
 
@@ -422,8 +437,8 @@ def main():
                         "Order_Line_ID": ol["Order_Line_ID"],
                         "Quantity_Shipped": ol["Quantity_Shipped"]
                     })
-                # UPDATED: pass inv_levels so returns restock at source hub
-                next_rt = handle_returns(shipped_lines, arrival_date, sku_to_cat, next_rt, rets, inv_levels)
+                # Queue returns; restock will occur on Return_Date
+                next_rt = handle_returns(shipped_lines, arrival_date, sku_to_cat, next_rt, rets, inv_levels, pending_returns)
 
             # For mixed-source orders, local items are available immediately at cross-dock
             if crossdock_items and inter_legs_created:
@@ -474,8 +489,8 @@ def main():
                                 "Order_Line_ID": ol["Order_Line_ID"],
                                 "Quantity_Shipped": ol["Quantity_Shipped"]
                             })
-                        # UPDATED: pass inv_levels so returns restock at source hub
-                        next_rt = handle_returns(order_lines, arrival_date, sku_to_cat, next_rt, rets, inv_levels)
+                        # Queue returns; restock will occur on Return_Date
+                        next_rt = handle_returns(order_lines, arrival_date, sku_to_cat, next_rt, rets, inv_levels, pending_returns)
                         pending_crossdock[hub] = [item for item in pending_crossdock[hub] if item["Order_ID"] != ord_id]
                 if hub in pending_crossdock and not pending_crossdock[hub]:
                     del pending_crossdock[hub]
