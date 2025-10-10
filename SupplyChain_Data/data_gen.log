@@ -1,18 +1,18 @@
-2025-10-10 20:55:01,658 INFO Hubs: 3
-2025-10-10 20:55:01,659 INFO Stores: 59
-2025-10-10 20:55:01,663 INFO Products: 500
-2025-10-10 20:55:01,663 INFO Suppliers: 20
-2025-10-10 20:55:01,675 INFO Seeded inventory: 500 hub-SKU pairs
-2025-10-10 20:55:01,676 INFO Yearly growth rates (YOY): {2022: -0.015159465808893872, 2023: 0.14374857926663354, 2024: 0.0887120796585086, 2025: 0.1357690417970851}
-2025-10-10 21:11:54,169 INFO Saved dim_hubs.csv (3 rows)
-2025-10-10 21:11:54,171 INFO Saved dim_stores.csv (59 rows)
-2025-10-10 21:11:54,173 INFO Saved dim_products.csv (500 rows)
-2025-10-10 21:11:54,173 INFO Saved dim_suppliers.csv (20 rows)
-2025-10-10 21:11:54,537 INFO Saved fact_orders.csv (173884 rows)
-2025-10-10 21:11:54,681 INFO Saved fact_shipments.csv (64729 rows)
-2025-10-10 21:11:54,827 INFO Saved link_shipment_orders.csv (295132 rows)
-2025-10-10 21:11:54,855 INFO Saved fact_inbound_shipments.csv (14650 rows)
-2025-10-10 21:11:55,415 INFO Saved fact_inventory_snapshot.csv (638500 rows)
-2025-10-10 21:11:55,429 INFO Saved fact_returns.csv (8069 rows)
-2025-10-10 21:11:55,431 INFO Saved fact_backorders.csv (478 rows)
-2025-10-10 21:11:55,431 INFO Generation complete.
+2025-10-10 22:21:29,065 INFO Hubs: 3
+2025-10-10 22:21:29,066 INFO Stores: 59
+2025-10-10 22:21:29,070 INFO Products: 500
+2025-10-10 22:21:29,071 INFO Suppliers: 20
+2025-10-10 22:21:29,092 INFO Seeded inventory: 500 hub-SKU pairs
+2025-10-10 22:21:29,092 INFO Yearly growth rates (YOY): {2022: -0.015159465808893872, 2023: 0.14374857926663354, 2024: 0.0887120796585086, 2025: 0.1357690417970851}
+2025-10-10 22:45:37,445 INFO Saved dim_hubs.csv (3 rows)
+2025-10-10 22:45:37,447 INFO Saved dim_stores.csv (59 rows)
+2025-10-10 22:45:37,449 INFO Saved dim_products.csv (500 rows)
+2025-10-10 22:45:37,450 INFO Saved dim_suppliers.csv (20 rows)
+2025-10-10 22:45:37,822 INFO Saved fact_orders.csv (173917 rows)
+2025-10-10 22:45:37,978 INFO Saved fact_shipments.csv (64718 rows)
+2025-10-10 22:45:38,136 INFO Saved link_shipment_orders.csv (295605 rows)
+2025-10-10 22:45:38,162 INFO Saved fact_inbound_shipments.csv (14481 rows)
+2025-10-10 22:45:38,748 INFO Saved fact_inventory_snapshot.csv (638500 rows)
+2025-10-10 22:45:38,760 INFO Saved fact_returns.csv (8137 rows)
+2025-10-10 22:45:38,762 INFO Saved fact_backorders.csv (455 rows)
+2025-10-10 22:45:38,762 INFO Generation complete.
