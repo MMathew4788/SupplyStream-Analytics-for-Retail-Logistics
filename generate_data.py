@@ -3,7 +3,7 @@
 import logging, random
 from datetime import datetime, timedelta, date
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 from collections import defaultdict
 
 import numpy as np
@@ -14,17 +14,25 @@ from faker import Faker
 # 1. CONFIG & SEED
 # ----------------------------------------------------------------------------
 CFG = {
-    "NUM_STORES":    100,  # Realistic for a regional chain
-    "NUM_PRODUCTS":  500,  # Moderate SKU count for apparel retail
-    "NUM_SUPPLIERS": 20,   # Few specialized suppliers
-    "NUM_ORDERS":    50000,  # ~40 orders/day over full window for ~100 stores
+    "NUM_STORES":    100,
+    "NUM_PRODUCTS":  500,
+    "NUM_SUPPLIERS": 20,
+    "NUM_ORDERS":    50000,
     "START_DATE":    datetime(2022, 1, 1),
     "END_DATE":      datetime(2025, 6, 30),
     "OUT_DIR":       Path("SupplyChain_Data"),
     "SEED":          42,
-    "SERVICE_FACTOR":1.65,  # ~95% service level
-    "LT_MEAN":       7,     # Domestic lead time (days)
+    "SERVICE_FACTOR":1.65,
+    "LT_MEAN":       7,
     "LT_STD":        2,
+    # Truck capacity constraints
+    "TRUCK_MAX_WEIGHT_KG": 10000,
+    "TRUCK_MAX_VOLUME_CBM": 60,
+    "TRUCK_MIN_LOAD_PCT": 0.30,
+    # Operational parameters
+    "TRUCK_SPEED_KM_PER_DAY": 500,
+    "CROSSDOCK_PROCESSING_HOURS": 8,
+    "EXPRESS_URGENCY_DAYS": 3,
 }
 
 random.seed(CFG["SEED"])
@@ -77,18 +85,29 @@ def sample_lead_time() -> int:
     return max(3, min(14, lt))
 
 def courier_cost(dist_km:int, wt_kg:float, vol_cbm:float, is_inter_hub:bool=False) -> float:
-    """
-    Base ₹300 + ₹15/km + ₹8 per chargeable kg
-    chargeable_kg = max(actual_kg, volumetric_kg)
-    volumetric_kg = vol_cbm * 200 (standard)
-    For inter-hub (truck), multiply by 1.2 for bulk efficiency
-    """
     vol_kg = vol_cbm * 200
     chg_kg = max(wt_kg, vol_kg)
     cost = 300 + 15*dist_km + 8*chg_kg
     if is_inter_hub:
         cost *= 1.2
     return round(cost, 2)
+
+def calculate_transit_days(distance_km: int, is_inter_hub: bool = False) -> int:
+    """Calculate realistic transit time based on distance."""
+    if is_inter_hub:
+        # Truck speed: 500 km/day, minimum 1 day
+        days = max(1, int(np.ceil(distance_km / CFG["TRUCK_SPEED_KM_PER_DAY"])))
+        # Add small random variation (±1 day for delays/traffic)
+        days += random.choice([-1, 0, 0, 0, 1])
+        return max(1, days)
+    else:
+        # Final-mile courier: faster for short distances
+        if distance_km <= 50:
+            return 1
+        elif distance_km <= 100:
+            return random.choice([1, 2])
+        else:
+            return 2
 
 # ----------------------------------------------------------------------------
 # 3. DIMENSIONS
@@ -102,35 +121,39 @@ def gen_hubs() -> pd.DataFrame:
     log.info("Hubs: %d", len(df))
     return df
 
-def gen_stores() -> Tuple[pd.DataFrame, Dict[str, float]]:
-    """
-    Adds Store_Type=major/minor for distance scaling.
-    """
+def gen_stores() -> Tuple[pd.DataFrame, Dict[str, float], Dict[str, int]]:
+    """Generate stores with distance from home hub."""
     placements = {
         "HUB-DEL": (["Delhi","Gurgaon","Noida","Jaipur"], ["Agra","Lucknow","Kanpur","Patna","Mathura"]),
         "HUB-BOM": (["Pune","Surat","Ahmedabad","Thane"], ["Nagpur","Bhopal","Raipur","Indore","Rajkot"]),
-        "HUB-BLR": (["Bengaluru","Chennai","Hyderabad"],   ["Coimbatore","Kochi","Tirupati"]),
+        "HUB-BLR": (["Bengaluru","Chennai","Hyderabad"],   ["Coimbatore","Kochi","Tiruputi"]),
     }
-    rows, mult = [], {}
+    rows, mult, distances = [], {}, {}
     sid = 1
     for hub, (maj, minr) in placements.items():
         for city in maj:
             for _ in range(3):
                 s = f"ST{sid:03d}"
+                dist = random.randint(20, 50)
                 rows.append({"Store_ID":s,"Home_Hub_ID":hub,"City":city,"Store_Type":"major"})
-                mult[s] = random.uniform(1.5, 2.5); sid += 1
+                mult[s] = random.uniform(1.5, 2.5)
+                distances[s] = dist
+                sid += 1
         for city in minr:
             for _ in range(2):
                 s = f"ST{sid:03d}"
+                dist = random.randint(60, 150)
                 rows.append({"Store_ID":s,"Home_Hub_ID":hub,"City":city,"Store_Type":"minor"})
-                mult[s] = random.uniform(0.8, 1.2); sid += 1
+                mult[s] = random.uniform(0.8, 1.2)
+                distances[s] = dist
+                sid += 1
 
     df = (pd.DataFrame(rows)
           .sample(frac=1, random_state=CFG["SEED"])
           .head(CFG["NUM_STORES"])
           .reset_index(drop=True))
     log.info("Stores: %d", len(df))
-    return df, mult
+    return df, mult, distances
 
 def gen_products() -> pd.DataFrame:
     specs = {
@@ -203,7 +226,7 @@ def seed_inventory(hubs: pd.DataFrame, prods: pd.DataFrame) -> Dict[Tuple[str, s
     return inv
 
 # ----------------------------------------------------------------------------
-# 5. RETURNS HANDLER (deferred restock on Return_Date)
+# 5. RETURNS HANDLER
 # ----------------------------------------------------------------------------
 def handle_returns(
     order_lines: List[Dict],
@@ -214,10 +237,6 @@ def handle_returns(
     inv_levels: Dict[Tuple[str, str], int],
     pending_returns: List[Dict]
 ) -> int:
-    """
-    Create returns with a Return_Date in the future and enqueue them.
-    Inventory restock occurs when today == Return_Date in the main loop.
-    """
     for ol in order_lines:
         shipped_qty = ol.get("Quantity_Shipped", 0)
         if shipped_qty <= 0:
@@ -239,7 +258,6 @@ def handle_returns(
                 "Return_Date":       ret_date,
                 "Return_Reason":     reason
             })
-            # Defer restock to Return_Date
             pending_returns.append({
                 "Return_Date":  ret_date,
                 "Hub_ID":       ol["Source_Hub_ID"],
@@ -250,15 +268,176 @@ def handle_returns(
     return next_rt
 
 # ----------------------------------------------------------------------------
-# 6. DAILY PIPELINE
+# 6. IMPROVED TRUCK CONSOLIDATION WITH URGENCY LOGIC
+# ----------------------------------------------------------------------------
+class TruckLoadManager:
+    """Manages consolidation of inter-hub shipments with urgency-based priority."""
+
+    def __init__(self, sku_to_wt: Dict, sku_to_vol: Dict):
+        self.sku_to_wt = sku_to_wt
+        self.sku_to_vol = sku_to_vol
+        self.pending_loads: Dict[Tuple[str, str, date], List[Dict]] = defaultdict(list)
+
+    def add_shipment_item(self, origin: str, destination: str, dispatch_date: date, 
+                          order_line_id: str, sku: str, quantity: int, order_id: str,
+                          required_delivery_date: date, is_express: bool = False):
+        """Add an item to pending consolidated shipment with urgency info."""
+        key = (origin, destination, dispatch_date)
+        self.pending_loads[key].append({
+            "Order_Line_ID": order_line_id,
+            "SKU": sku,
+            "Quantity": quantity,
+            "Order_ID": order_id,
+            "Required_Delivery_Date": required_delivery_date,
+            "Is_Express": is_express
+        })
+
+    def get_load_metrics(self, items: List[Dict]) -> Tuple[float, float]:
+        total_weight = sum(item["Quantity"] * self.sku_to_wt[item["SKU"]] for item in items)
+        total_volume = sum(item["Quantity"] * self.sku_to_vol[item["SKU"]] for item in items)
+        return total_weight, total_volume
+
+    def check_capacity(self, weight: float, volume: float) -> bool:
+        return (weight <= CFG["TRUCK_MAX_WEIGHT_KG"] and 
+                volume <= CFG["TRUCK_MAX_VOLUME_CBM"])
+
+    def check_minimum_threshold(self, weight: float, volume: float) -> bool:
+        min_weight = CFG["TRUCK_MAX_WEIGHT_KG"] * CFG["TRUCK_MIN_LOAD_PCT"]
+        min_volume = CFG["TRUCK_MAX_VOLUME_CBM"] * CFG["TRUCK_MIN_LOAD_PCT"]
+        return weight >= min_weight or volume >= min_volume
+
+    def has_express_items(self, items: List[Dict]) -> bool:
+        """Check if any items in the load are express/urgent."""
+        return any(item.get("Is_Express", False) for item in items)
+
+    def process_ready_trucks(self, current_date: date, next_leg: int, 
+                           legs: List[Dict], links: List[Dict],
+                           pending_crossdock: Dict, delay_buffer: List[Dict]) -> int:
+        routes_to_remove = []
+
+        for (origin, destination, dispatch_date), items in self.pending_loads.items():
+            if dispatch_date > current_date:
+                continue
+
+            total_weight, total_volume = self.get_load_metrics(items)
+            has_express = self.has_express_items(items)
+
+            # Express shipments bypass minimum threshold
+            if not has_express and not self.check_minimum_threshold(total_weight, total_volume):
+                next_dispatch = dispatch_date + timedelta(days=1)
+                for item in items:
+                    delay_buffer.append({
+                        "origin": origin,
+                        "destination": destination,
+                        "dispatch_date": next_dispatch,
+                        "item": item
+                    })
+                routes_to_remove.append((origin, destination, dispatch_date))
+                continue
+
+            trucks = self._split_into_trucks(items)
+
+            for truck_items in trucks:
+                truck_weight, truck_volume = self.get_load_metrics(truck_items)
+                lid = f"SL{next_leg:06d}"
+                next_leg += 1
+
+                dist_key = (origin, destination)
+                dist = HUB_DIST_MATRIX.get(dist_key, random.randint(200, 1000))
+
+                # Realistic transit time based on distance
+                transit_days = calculate_transit_days(dist, is_inter_hub=True)
+                arrival_date = dispatch_date + timedelta(days=transit_days)
+
+                cost = courier_cost(dist, truck_weight, truck_volume, is_inter_hub=True)
+
+                leg = {
+                    "Shipment_Leg_ID": lid,
+                    "Leg_Type": "Inter-Hub",
+                    "Transport_Mode": "Truck",
+                    "Origin": origin,
+                    "Destination": destination,
+                    "Dispatch_Date": dispatch_date,
+                    "Arrival_Date": arrival_date,
+                    "Transportation_Cost": cost
+                }
+                legs.append(leg)
+
+                for item in truck_items:
+                    links.append({
+                        "Shipment_Leg_ID": lid,
+                        "Order_Line_ID": item["Order_Line_ID"],
+                        "Quantity_Shipped": item["Quantity"]
+                    })
+
+                    pending_crossdock.setdefault(destination, []).append({
+                        "Order_ID": item["Order_ID"],
+                        "SKU": item["SKU"],
+                        "Quantity": item["Quantity"],
+                        "Arrival_Date": arrival_date,
+                        "From_Hub": origin,
+                        "Required_Delivery_Date": item["Required_Delivery_Date"]
+                    })
+
+            routes_to_remove.append((origin, destination, dispatch_date))
+
+        for key in routes_to_remove:
+            del self.pending_loads[key]
+
+        return next_leg
+
+    def _split_into_trucks(self, items: List[Dict]) -> List[List[Dict]]:
+        trucks = []
+        current_truck = []
+        current_weight = 0.0
+        current_volume = 0.0
+
+        for item in items:
+            item_weight = item["Quantity"] * self.sku_to_wt[item["SKU"]]
+            item_volume = item["Quantity"] * self.sku_to_vol[item["SKU"]]
+
+            if (current_weight + item_weight > CFG["TRUCK_MAX_WEIGHT_KG"] or
+                current_volume + item_volume > CFG["TRUCK_MAX_VOLUME_CBM"]):
+                if current_truck:
+                    trucks.append(current_truck)
+                    current_truck = []
+                    current_weight = 0.0
+                    current_volume = 0.0
+
+            current_truck.append(item)
+            current_weight += item_weight
+            current_volume += item_volume
+
+        if current_truck:
+            trucks.append(current_truck)
+
+        return trucks
+
+# ----------------------------------------------------------------------------
+# 7. BACKORDER TRACKING
+# ----------------------------------------------------------------------------
+def track_backorder(order_line: Dict, backorders: List[Dict], next_bo: int) -> int:
+    """Track unfulfilled order lines as backorders."""
+    backorders.append({
+        "Backorder_ID": f"BO{next_bo:05d}",
+        "Order_Line_ID": order_line["Order_Line_ID"],
+        "Order_ID": order_line["Order_ID"],
+        "SKU": order_line["SKU"],
+        "Quantity_Backordered": order_line["Quantity_Ordered"] - order_line.get("Quantity_Shipped", 0),
+        "Backorder_Date": order_line["Order_Date"],
+        "Status": "Pending"
+    })
+    return next_bo + 1
+
+# ----------------------------------------------------------------------------
+# 8. MAIN SIMULATION
 # ----------------------------------------------------------------------------
 def main():
     hubs                = gen_hubs()
-    stores, mult_map    = gen_stores()
+    stores, mult_map, store_distances = gen_stores()
     prods               = gen_products()
     sup_dim, sup_full   = gen_suppliers()
 
-    # Lookups
     hub_map    = hubs.set_index("Specialty")["Hub_ID"].to_dict()
     sku_to_cat = prods.set_index("SKU")["Category"].to_dict()
     sku_to_rop = prods.set_index("SKU")["ROP"].to_dict()
@@ -268,9 +447,13 @@ def main():
 
     inv_levels       = seed_inventory(hubs, prods)
     pending_inb: List[Dict] = []
-    pending_crossdock: Dict[str, List[Dict]] = {}  # hub_id -> items
-    pending_returns: List[Dict] = []               # NEW: deferred returns
-    next_ord, next_ol, next_leg, next_inb, next_rt = 1, 1, 1, 1, 1
+    pending_crossdock: Dict[str, List[Dict]] = {}
+    pending_returns: List[Dict] = []
+
+    truck_manager = TruckLoadManager(sku_to_wt, sku_to_vol)
+    delay_buffer: List[Dict] = []
+
+    next_ord, next_ol, next_leg, next_inb, next_rt, next_bo = 1, 1, 1, 1, 1, 1
 
     orders: List[Dict] = []
     legs:   List[Dict] = []
@@ -278,12 +461,13 @@ def main():
     inbs:   List[Dict] = []
     rets:   List[Dict] = []
     snaps:  List[Dict] = []
+    backorders: List[Dict] = []
 
     total_days = (CFG["END_DATE"] - CFG["START_DATE"]).days + 1
     avg_daily  = CFG["NUM_ORDERS"] / total_days
 
     years = range(CFG["START_DATE"].year, CFG["END_DATE"].year + 1)
-    year_growth = {year: random.uniform(-0.05, 0.15) for year in years}  # -10% to +15%
+    year_growth = {year: random.uniform(-0.05, 0.15) for year in years}
     log.info("Yearly growth rates (YOY): %s", year_growth)
 
     cum_multiplier: Dict[int, float] = {}
@@ -296,21 +480,33 @@ def main():
     for ts in calendar:
         today = ts.date()
 
-        # 0) Apply any returns due today before other movements (ensures snapshot alignment)
+        # Process delayed items
+        for delayed in delay_buffer[:]:
+            truck_manager.add_shipment_item(
+                delayed["origin"], delayed["destination"], 
+                delayed["dispatch_date"], delayed["item"]["Order_Line_ID"],
+                delayed["item"]["SKU"], delayed["item"]["Quantity"],
+                delayed["item"]["Order_ID"], 
+                delayed["item"]["Required_Delivery_Date"],
+                delayed["item"]["Is_Express"]
+            )
+        delay_buffer.clear()
+
+        # Apply returns
         for pr in pending_returns[:]:
             if pr["Return_Date"] == today:
                 key = (pr["Hub_ID"], pr["SKU"])
                 inv_levels[key] = inv_levels.get(key, 0) + pr["Quantity"]
                 pending_returns.remove(pr)
 
-        # 1) Inbound arrivals
+        # Inbound arrivals
         for ev in pending_inb[:]:
             if ev["Actual_Arrival_Date"] == today:
                 inv_levels[(ev["Destination_Hub_ID"], ev["SKU"])] = inv_levels.get((ev["Destination_Hub_ID"], ev["SKU"]), 0) + ev["Quantity_Received"]
                 inbs.append({**ev, "Actual_Arrival_Date": today})
                 pending_inb.remove(ev)
 
-        # 2) Generate daily orders as grouped multi-line orders
+        # Generate daily orders
         adjusted_avg_daily = avg_daily * cum_multiplier[today.year]
         nords = np.random.poisson(adjusted_avg_daily)
         daily_orders = []
@@ -319,6 +515,12 @@ def main():
             home_hub  = store_row["Home_Hub_ID"]
             num_lines = random.randint(1, 5)
             order_id  = f"ORD{next_ord:05d}"
+
+            # Calculate Required_Delivery_Date
+            required_delivery_date = today + timedelta(days=random.randint(3, 10))
+            urgency_days = (required_delivery_date - today).days
+            is_express = urgency_days <= CFG["EXPRESS_URGENCY_DAYS"]
+
             next_ord += 1
             order_lines = []
             for __ in range(num_lines):
@@ -339,8 +541,9 @@ def main():
                     "SKU": prod.SKU,
                     "Source_Hub_ID": hub_map[prod.Category],
                     "Order_Date": today,
-                    "Required_Delivery_Date": today + timedelta(days=random.randint(3,10)),
-                    "Quantity_Ordered": q
+                    "Required_Delivery_Date": required_delivery_date,
+                    "Quantity_Ordered": q,
+                    "Is_Express": is_express
                 }
                 order_lines.append(ol)
                 next_ol += 1
@@ -348,17 +551,19 @@ def main():
                 "Order_ID": order_id,
                 "Store_ID": store_row.Store_ID,
                 "Home_Hub_ID": home_hub,
-                "Lines": order_lines
+                "Lines": order_lines,
+                "Required_Delivery_Date": required_delivery_date,
+                "Is_Express": is_express
             })
 
-        # 3) Process each order: picking, inter-hub shipments, cross-dock queue
+        # Process orders
         for order in daily_orders:
             home_hub = order["Home_Hub_ID"]
             source_hubs = set(ol["Source_Hub_ID"] for ol in order["Lines"])
             is_direct = len(source_hubs) == 1 and home_hub in source_hubs
 
             crossdock_items: Dict[str, int] = {}
-            inter_legs_created = False
+            inter_hub_created = False
             shipped_lines: List[Dict] = []
 
             for ol in order["Lines"]:
@@ -366,60 +571,46 @@ def main():
                 key = (src_hub, ol["SKU"])
                 avail = inv_levels.get(key, 0)
                 ship = min(avail, ol["Quantity_Ordered"])
-                if ship == 0:
-                    continue
+
                 ol["Quantity_Shipped"] = ship
                 orders.append(ol)
-                inv_levels[key] -= ship
-                shipped_lines.append(ol)
 
-                if src_hub == home_hub:
-                    crossdock_items[ol["SKU"]] = crossdock_items.get(ol["SKU"], 0) + ship
-                else:
-                    inter_legs_created = True
-                    lid = f"SL{next_leg:06d}"
-                    next_leg += 1
-                    dist_key = (src_hub, home_hub)
-                    dist = HUB_DIST_MATRIX.get(dist_key, random.randint(200, 1000))
-                    wt  = ship * sku_to_wt[ol["SKU"]]
-                    vol = ship * sku_to_vol[ol["SKU"]]
-                    cost = courier_cost(dist, wt, vol, is_inter_hub=True)
-                    dispatch_date = today
-                    arrival_date  = today + timedelta(days=random.randint(1, 3))
-                    leg = {
-                        "Shipment_Leg_ID": lid,
-                        "Leg_Type": "Inter-Hub",
-                        "Transport_Mode": "Truck",
-                        "Origin": src_hub,
-                        "Destination": home_hub,
-                        "Dispatch_Date": dispatch_date,
-                        "Arrival_Date": arrival_date,
-                        "Transportation_Cost": cost
-                    }
-                    legs.append(leg)
-                    links.append({
-                        "Shipment_Leg_ID": lid,
-                        "Order_Line_ID": ol["Order_Line_ID"],
-                        "Quantity_Shipped": ship
-                    })
-                    pending_crossdock.setdefault(home_hub, []).append({
-                        "Order_ID": order["Order_ID"],
-                        "SKU": ol["SKU"],
-                        "Quantity": ship,
-                        "Arrival_Date": arrival_date,
-                        "From_Hub": src_hub
-                    })
+                if ship > 0:
+                    inv_levels[key] -= ship
+                    shipped_lines.append(ol)
 
-            # Direct final-mile if everything from home hub
+                    if src_hub == home_hub:
+                        crossdock_items[ol["SKU"]] = crossdock_items.get(ol["SKU"], 0) + ship
+                    else:
+                        inter_hub_created = True
+                        truck_manager.add_shipment_item(
+                            origin=src_hub,
+                            destination=home_hub,
+                            dispatch_date=today,
+                            order_line_id=ol["Order_Line_ID"],
+                            sku=ol["SKU"],
+                            quantity=ship,
+                            order_id=order["Order_ID"],
+                            required_delivery_date=ol["Required_Delivery_Date"],
+                            is_express=ol["Is_Express"]
+                        )
+
+                # Track backorders for unfulfilled quantities
+                if ship < ol["Quantity_Ordered"]:
+                    next_bo = track_backorder(ol, backorders, next_bo)
+
+            # Direct final-mile
             if is_direct and crossdock_items:
                 lid = f"SL{next_leg:06d}"
                 next_leg += 1
                 wt  = sum(qty * sku_to_wt[sku] for sku, qty in crossdock_items.items())
                 vol = sum(qty * sku_to_vol[sku] for sku, qty in crossdock_items.items())
-                st_type = stores.set_index("Store_ID").loc[order["Store_ID"], "Store_Type"]
-                dist = random.randint(20,50) if st_type == "major" else random.randint(50,120)
+
+                dist = store_distances[order["Store_ID"]]
+                transit_days = calculate_transit_days(dist, is_inter_hub=False)
+                arrival_date = today + timedelta(days=transit_days)
+
                 cost = courier_cost(dist, wt, vol)
-                arrival_date = today + timedelta(days=1)
                 leg = {
                     "Shipment_Leg_ID": lid,
                     "Leg_Type": "Final-Mile",
@@ -437,65 +628,86 @@ def main():
                         "Order_Line_ID": ol["Order_Line_ID"],
                         "Quantity_Shipped": ol["Quantity_Shipped"]
                     })
-                # Queue returns; restock will occur on Return_Date
                 next_rt = handle_returns(shipped_lines, arrival_date, sku_to_cat, next_rt, rets, inv_levels, pending_returns)
 
-            # For mixed-source orders, local items are available immediately at cross-dock
-            if crossdock_items and inter_legs_created:
+            # Mixed orders
+            if crossdock_items and inter_hub_created:
                 for sku, qty in crossdock_items.items():
                     pending_crossdock.setdefault(home_hub, []).append({
                         "Order_ID": order["Order_ID"],
                         "SKU": sku,
                         "Quantity": qty,
-                        "Arrival_Date": today,  # immediate
-                        "From_Hub": home_hub
+                        "Arrival_Date": today,
+                        "From_Hub": home_hub,
+                        "Required_Delivery_Date": order["Required_Delivery_Date"]
                     })
 
-        # 4) Cross-dock consolidation when all parts have arrived
+        # Process consolidated trucks
+        next_leg = truck_manager.process_ready_trucks(
+            today, next_leg, legs, links, pending_crossdock, delay_buffer
+        )
+
+        # Cross-dock consolidation with processing time - FIXED
         if pending_crossdock:
             for hub in list(pending_crossdock.keys()):
                 order_ids = set(item["Order_ID"] for item in pending_crossdock[hub])
                 for ord_id in list(order_ids):
                     all_for_order = [item for item in pending_crossdock[hub] if item["Order_ID"] == ord_id]
                     arrived_for_order = [item for item in all_for_order if item["Arrival_Date"] <= today]
+
                     if len(arrived_for_order) == len(all_for_order) and len(arrived_for_order) > 0:
-                        order_items: Dict[str, int] = defaultdict(int)
-                        for item in arrived_for_order:
-                            order_items[item["SKU"]] += item["Quantity"]
-                        store_id = next(ol["Store_ID"] for ol in orders if ol["Order_ID"] == ord_id)
-                        lid = f"SL{next_leg:06d}"
-                        next_leg += 1
-                        wt  = sum(qty * sku_to_wt[sku] for sku, qty in order_items.items())
-                        vol = sum(qty * sku_to_vol[sku] for sku, qty in order_items.items())
-                        st_type = stores.set_index("Store_ID").loc[store_id, "Store_Type"]
-                        dist = random.randint(20,50) if st_type == "major" else random.randint(50,120)
-                        cost = courier_cost(dist, wt, vol)
-                        arrival_date = today + timedelta(days=1)
-                        leg = {
-                            "Shipment_Leg_ID": lid,
-                            "Leg_Type": "Final-Mile",
-                            "Transport_Mode": "Courier",
-                            "Origin": hub,
-                            "Destination": store_id,
-                            "Dispatch_Date": today,
-                            "Arrival_Date": arrival_date,
-                            "Transportation_Cost": cost
-                        }
-                        legs.append(leg)
-                        order_lines = [ol for ol in orders if ol["Order_ID"] == ord_id]
-                        for ol in order_lines:
-                            links.append({
+                        # Add cross-dock processing time - FIXED DATE HANDLING
+                        last_arrival = max(item["Arrival_Date"] for item in arrived_for_order)
+
+                        # Calculate processing days (8 hours = 0.33 days, round up to 1 day)
+                        processing_days = 1 if CFG["CROSSDOCK_PROCESSING_HOURS"] >= 4 else 0
+                        earliest_dispatch = last_arrival + timedelta(days=processing_days)
+
+                        # Only dispatch if processing is complete
+                        if today >= earliest_dispatch:
+                            order_items: Dict[str, int] = defaultdict(int)
+                            required_delivery = None
+                            for item in arrived_for_order:
+                                order_items[item["SKU"]] += item["Quantity"]
+                                if required_delivery is None:
+                                    required_delivery = item.get("Required_Delivery_Date")
+
+                            store_id = next(ol["Store_ID"] for ol in orders if ol["Order_ID"] == ord_id)
+                            lid = f"SL{next_leg:06d}"
+                            next_leg += 1
+                            wt  = sum(qty * sku_to_wt[sku] for sku, qty in order_items.items())
+                            vol = sum(qty * sku_to_vol[sku] for sku, qty in order_items.items())
+
+                            dist = store_distances[store_id]
+                            transit_days = calculate_transit_days(dist, is_inter_hub=False)
+                            arrival_date = today + timedelta(days=transit_days)
+
+                            cost = courier_cost(dist, wt, vol)
+                            leg = {
                                 "Shipment_Leg_ID": lid,
-                                "Order_Line_ID": ol["Order_Line_ID"],
-                                "Quantity_Shipped": ol["Quantity_Shipped"]
-                            })
-                        # Queue returns; restock will occur on Return_Date
-                        next_rt = handle_returns(order_lines, arrival_date, sku_to_cat, next_rt, rets, inv_levels, pending_returns)
-                        pending_crossdock[hub] = [item for item in pending_crossdock[hub] if item["Order_ID"] != ord_id]
+                                "Leg_Type": "Final-Mile",
+                                "Transport_Mode": "Courier",
+                                "Origin": hub,
+                                "Destination": store_id,
+                                "Dispatch_Date": today,
+                                "Arrival_Date": arrival_date,
+                                "Transportation_Cost": cost
+                            }
+                            legs.append(leg)
+                            order_lines = [ol for ol in orders if ol["Order_ID"] == ord_id]
+                            for ol in order_lines:
+                                links.append({
+                                    "Shipment_Leg_ID": lid,
+                                    "Order_Line_ID": ol["Order_Line_ID"],
+                                    "Quantity_Shipped": ol["Quantity_Shipped"]
+                                })
+                            next_rt = handle_returns(order_lines, arrival_date, sku_to_cat, next_rt, rets, inv_levels, pending_returns)
+                            pending_crossdock[hub] = [item for item in pending_crossdock[hub] if item["Order_ID"] != ord_id]
+
                 if hub in pending_crossdock and not pending_crossdock[hub]:
                     del pending_crossdock[hub]
 
-        # 5) Replenishment: one inbound container per hub when any SKU under ROP
+        # Replenishment
         for hub in hubs.Hub_ID:
             lows = [sku for (h,sku), qty in inv_levels.items() if h == hub and qty < sku_to_rop[sku]]
             if not lows:
@@ -519,7 +731,7 @@ def main():
                 }
                 pending_inb.append(ev)
 
-        # 6) Daily inventory snapshot
+        # Daily inventory snapshot
         for (hub, sku), qty in inv_levels.items():
             snaps.append({
                 "Snapshot_Date":    today,
@@ -528,7 +740,7 @@ def main():
                 "Quantity_On_Hand": qty
             })
 
-    # 7) Save all outputs
+    # Save outputs
     tables = [
         (hubs,   "dim_hubs.csv"),
         (stores, "dim_stores.csv"),
@@ -540,6 +752,7 @@ def main():
         (pd.DataFrame(inbs),   "fact_inbound_shipments.csv"),
         (pd.DataFrame(snaps),  "fact_inventory_snapshot.csv"),
         (pd.DataFrame(rets),   "fact_returns.csv"),
+        (pd.DataFrame(backorders), "fact_backorders.csv"),
     ]
     for df, name in tables:
         df.to_csv(CFG["OUT_DIR"]/name, index=False)
