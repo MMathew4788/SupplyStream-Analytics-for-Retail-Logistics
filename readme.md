@@ -12,6 +12,12 @@ Designed for:
 
 ---
 
+## 🔍 View the live interactive preview of Dashboard
+
+🔗[Live Preview](https://app.powerbi.com/view?r=eyJrIjoiZWM1ZjcwYjgtODVlMy00ZDYzLWJlYmUtNDBkYjBkZDZkN2JiIiwidCI6ImM2ZTU0OWIzLTVmNDUtNDAzMi1hYWU5LWQ0MjQ0ZGM1YjJjNCJ9)
+
+---
+
 ## 🛠️ Architecture Summary
 
 ```
@@ -113,6 +119,7 @@ https://raw.githubusercontent.com/your-username/repo-name/main/SupplyChain_Data/
 - Define relationships in Model View
 
 ### 📐 Define Relationships & DAX Measures
+
 - Use Model View to link tables
 - Create DAX measures for KPIs
 
@@ -121,6 +128,10 @@ https://raw.githubusercontent.com/your-username/repo-name/main/SupplyChain_Data/
 The `Analysis.pbix` file is available in the root folder of this repository.
 
 ---
+
+## 📖 Learn More About This Project
+
+🌐[View the project web page](https://www.manojmathew.com/project2.html)
 
 ## 🙌 Contribute, Fork, and Share
 
