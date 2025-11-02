@@ -14,7 +14,7 @@ Designed for:
 
 ## 🔍 View the live interactive preview of Dashboard
 
-🔗[Live Preview](https://app.powerbi.com/view?r=eyJrIjoiZWM1ZjcwYjgtODVlMy00ZDYzLWJlYmUtNDBkYjBkZDZkN2JiIiwidCI6ImM2ZTU0OWIzLTVmNDUtNDAzMi1hYWU5LWQ0MjQ0ZGM1YjJjNCJ9)
+🔗[Live Preview](https://app.powerbi.com/view?r=eyJrIjoiY2FhMTJlMTgtMTBmZC00ZTAwLWJhMmMtY2U5ZjJmZTAxNTA3IiwidCI6ImM2ZTU0OWIzLTVmNDUtNDAzMi1hYWU5LWQ0MjQ0ZGM1YjJjNCJ9)
 
 ---
 
